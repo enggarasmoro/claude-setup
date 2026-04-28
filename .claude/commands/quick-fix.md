@@ -1,65 +1,65 @@
 ---
-description: Perbaikan bug kecil dan hotfix cepat - skip research, minimal verify
+description: Fast bug fixes and hotfixes — skip research, minimal verify
 ---
 
 # Quick-Fix Workflow
 
-## Kapan Digunakan
-- Bug fix dengan root cause yang sudah diketahui
-- Perubahan kecil terisolasi (< 50 baris)
-- Hotfix untuk isu produksi
-- Menangani temuan dari `/audit`
+## When to Use
+- Bug fixes with a known root cause
+- Small, isolated changes (< 50 lines)
+- Production hotfixes
+- Addressing findings from `/audit`
 
-## Jangan Gunakan Untuk
-- Fitur baru → gunakan `/orchestrator`
-- Refactoring → gunakan `/refactor`
-- Perubahan yang menyentuh banyak fitur atau modul
+## Do Not Use For
+- New features → use `/orchestrator`
+- Large restructuring → use `/refactor`
+- Changes touching multiple features or modules
 
 ## Pre-Implementation Checklist
-Sebelum mulai, HARUS:
-1. Baca `.claude/rules/rule-priority.md`
-2. Konfirmasi scope fix benar-benar kecil dan terisolasi
+Before starting, you MUST:
+1. Read `.claude/rules/rule-priority.md`
+2. Confirm the fix scope is truly small and isolated
 
 ---
 
-## Fase 1: Diagnose
+## Phase 1: Diagnose
 
-1. Identifikasi bug atau isu
-2. Temukan kode yang terpengaruh
-3. Jika penyebab tidak jelas, gunakan `/debug` untuk analisis sistematis
-4. Definisikan fix di `task.md` (maksimal 1-3 item)
+1. Identify the bug or issue
+2. Locate the affected code
+3. If the root cause is not obvious → use `/debug` for systematic analysis
+4. Define the fix in `task.md` (1–3 items maximum)
 
 ---
 
-## Fase 2: Fix + Test (TDD)
+## Phase 2: Fix + Test (TDD)
 
-1. **Tulis failing test** yang mereproduksi bug
-2. **Terapkan fix minimal** agar test lulus
-3. **Verifikasi test yang ada** masih lulus
+1. **Write a failing test** that reproduces the bug
+2. **Apply the minimal fix** to make the test pass
+3. **Verify all existing tests** still pass
 
-Rules yang berlaku:
+Applicable rules:
 - `.claude/rules/error-handling-principles.md`
 - `.claude/rules/logging-and-observability-mandate.md`
 
 ---
 
-## Fase 3: Verify + Ship
+## Phase 3: Verify + Ship
 
-1. Jalankan full validation suite:
+1. Run the full validation suite:
    ```bash
-   # Go: go vet ./... && go test ./...
+   # Go:         go vet ./... && go test ./...
    # TypeScript: tsc --noEmit && vitest run
-   # Python: mypy . && pytest
+   # Python:     mypy . && pytest
    ```
-2. Jika semua lulus → commit dengan format:
+2. If all checks pass → commit:
    ```
-   fix(<scope>): <deskripsi singkat>
+   fix(<scope>): <short description>
    ```
 
 ---
 
 ## Completion Criteria
-- [ ] Bug direproduksi dengan test
-- [ ] Fix diterapkan dan test lulus
-- [ ] Full verification suite lulus
-- [ ] Di-commit dengan tipe `fix`
+- [ ] Bug reproduced with a test
+- [ ] Fix applied and test passes
+- [ ] Full verification suite passes
+- [ ] Committed with type `fix`

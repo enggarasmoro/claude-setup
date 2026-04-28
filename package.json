@@ -1,12 +1,22 @@
 {
-  "name": "claude-setup",
+  "name": "@enggarasmoro/claude-setup",
   "version": "1.0.0",
   "description": "Claude Code configuration installer — engineering standards for AI-assisted development",
-  "keywords": ["claude", "claude-code", "ai", "engineering", "standards", "anthropic"],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai",
+    "engineering",
+    "standards",
+    "anthropic"
+  ],
   "homepage": "https://github.com/enggarasmoro/claude-setup#readme",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
-    "claude-setup": "./bin/index.js"
+    "claude-setup": "bin/index.js"
   },
   "files": [
     "bin/",

@@ -1,114 +1,112 @@
 ---
-description: Optimasi performa berbasis profiling - profile → analisis → prioritas → implementasi per fix
+description: Profile-driven performance optimization — profile → analyse → prioritise → implement one fix at a time
 ---
 
 # Performance Optimization Workflow
 
-**Trigger:** User memberikan data profiling, meminta optimasi performa, atau benchmark menunjukkan regresi.
+**Trigger:** User provides profiling data, requests performance optimization, or benchmarks show a regression.
 
-Sebelum mulai, baca skill dan modul bahasa yang relevan:
+Before starting, read the skill and the relevant language module:
 - `.claude/skills/perf-optimization/SKILL.md`
-- `.claude/skills/perf-optimization/languages/{bahasa}.md`
+- `.claude/skills/perf-optimization/languages/{language}.md`
 
 ---
 
-## Langkah-Langkah
+## Steps
 
-### 1. Kumpulkan Data Profile
+### 1. Collect Profile Data
 
-**Jika user memberikan file profile atau URL:**
-Gunakan script ekstraksi sesuai bahasa:
+**If the user provides a profile file or URL:**
 ```bash
-# Go CPU profile
+# Go — CPU profile
 bash .claude/skills/perf-optimization/scripts/go-pprof.sh cpu profile.prof
 
-# Go — generate + analisis sekaligus
+# Go — generate and analyse in one step
 bash .claude/skills/perf-optimization/scripts/go-pprof.sh bench ./path/to/package/... BenchmarkName
 
 # Frontend — Lighthouse
 bash .claude/skills/perf-optimization/scripts/frontend-lighthouse.sh
 ```
 
-**Jika user meminta profiling dari awal:**
-Jalankan script dalam mode `bench` untuk generate sekaligus analisis.
+**If the user requests profiling from scratch:**
+Run the script in `bench` mode to generate and analyse profiles in a single step.
 
 ---
 
-### 2. Analisis
+### 2. Analyse
 
-Buat dokumen analisis terstruktur di `docs/research_logs/{component}-perf-analysis.md`.
+Create a structured analysis document at `docs/research_logs/{component}-perf-analysis.md`.
 
-Metodologi analisis:
-1. Fokus pada cumulative cost, trace flat kembali ke user-land code
-2. Identifikasi top 3-5 offender
-3. Pisahkan benchmark artifacts dari production cost
-4. Identifikasi irreducible floors (lihat tabel di language module)
-
----
-
-### 3. Prioritas Fix
-
-Buat implementation plan dengan ranking berdasarkan impact/risk:
-- Low risk, high impact → kerjakan duluan
-- High risk, impact apapun → kerjakan terakhir atau lewati
-
-**Presentasikan rencana kepada user untuk persetujuan sebelum melanjutkan.**
+Analysis methodology:
+1. Focus on cumulative cost; trace flat back to user-land code
+2. Identify the top 3–5 offenders
+3. Separate benchmark artifacts from real production cost
+4. Identify irreducible floors (refer to the language module's table)
 
 ---
 
-### 4. Implementasi (satu fix per giliran)
+### 3. Prioritise Fixes
 
-Untuk setiap fix, ikuti urutan:
+Create an implementation plan ranked by impact / risk:
+- Low risk, high impact → do first
+- High risk, any impact → do last or skip
 
-1. **Tulis test dulu** (TDD Red → Green)
-2. **Implementasikan fix**
-3. **Jalankan semua test yang ada** (`go test -race ./...` atau equivalent)
-4. **Benchmark segera** — bandingkan ns/op, B/op, allocs/op
-5. **Jalankan quality check** (formatter, linter, security scanner)
-6. **Commit secara terpisah** dengan format conventional:
+**Present the plan to the user and wait for approval before writing any code.**
+
+---
+
+### 4. Implement (one fix at a time)
+
+For each fix:
+1. **Write the test first** (TDD Red → Green)
+2. **Implement the fix**
+3. **Run all existing tests** (`go test -race ./...` or equivalent)
+4. **Benchmark immediately** — compare ns/op, B/op, allocs/op
+5. **Run quality checks** (formatter, linter, security scanner)
+6. **Commit independently:**
    ```
-   perf(<scope>): <deskripsi>
+   perf(<scope>): <description>
    ```
 
-**Aturan:** Satu fix per commit. Jangan batch optimisasi.
+**Rule:** One fix per commit. Never batch optimisations.
 
 ---
 
 ### 5. Final Verification
 
-Setelah semua fix diterapkan:
-1. Jalankan full benchmark suite dengan minimal `-count=3`
-2. Bandingkan terhadap baseline asli (sebelum fix apapun)
-3. Jalankan complete test suite dengan `-race`
-4. Jalankan semua quality check (formatter, linter, security scanner, build)
+After all fixes are applied:
+1. Run the full benchmark suite with at least `-count=3`
+2. Compare against the original baseline (before any fixes)
+3. Run the complete test suite with `-race`
+4. Run all quality checks (formatter, linter, security scanner, build)
 
 ---
 
-### 6. Dokumentasi Hasil
+### 6. Document Results
 
-Update dokumen analisis dengan:
-- Tabel perbandingan benchmark before/after
-- Fix mana yang diterapkan dan mana yang dilewati (beserta alasan)
-- Peluang optimasi yang tersisa untuk sesi mendatang
+Update the analysis document with:
+- Before / after benchmark comparison table
+- Which fixes were applied and which were skipped (with reasons)
+- Remaining optimisation opportunities for future sessions
 
 ---
 
 ### 7. Ship
 
-Commit dan presentasikan hasil akhir kepada user dengan:
-- Tabel improvement benchmark kumulatif
-- Daftar commits
-- Follow-up items jika ada
+Commit and present final results to the user with:
+- Cumulative benchmark improvement table
+- List of commits
+- Any follow-up items
 
 ---
 
 ## Quick Reference
 
-| Fase | Output | Gate |
-|---|---|---|
-| Profile | Raw data + extracted markdown | Data terkumpul |
-| Analyze | `docs/research_logs/{component}-perf-analysis.md` | Top offenders teridentifikasi |
-| Prioritize | Implementation plan | User approved |
-| Implement | Tests + kode + benchmark per fix | Setiap fix lulus test |
-| Verify | Full benchmark comparison | Semua check lulus |
-| Ship | Conventional commits | User diberi tahu |
+| Phase | Output | Gate |
+|-------|--------|------|
+| Profile | Raw data + extracted markdown | Data collected |
+| Analyse | `docs/research_logs/{component}-perf-analysis.md` | Top offenders identified |
+| Prioritise | Implementation plan | User approved |
+| Implement | Tests + code + benchmark per fix | Each fix passes tests |
+| Verify | Full benchmark comparison | All checks pass |
+| Ship | Conventional commits | User notified |

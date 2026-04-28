@@ -1,105 +1,94 @@
 ---
-description: Pemecahan masalah kompleks secara iteratif dengan revisi dan branching - untuk perencanaan multi-langkah yang membutuhkan koreksi arah
+description: Iterative analysis for complex problems — step-by-step reasoning with revision and branching. Usage: /sequential-thinking <problem>
 ---
 
 # Sequential Thinking
 
-Masalah yang akan dianalisis: **$ARGUMENTS**
+Problem to analyse: **$ARGUMENTS**
 
-## Kapan Digunakan
-- Memecah masalah kompleks menjadi langkah-langkah yang bisa dikelola
-- Perencanaan dan desain yang membutuhkan penyempurnaan iteratif
-- Analisis yang mungkin perlu koreksi arah di tengah jalan
-- Masalah di mana scope penuh muncul selama analisis
-- Solusi multi-langkah yang membutuhkan konteks antar langkah
-- Generasi dan verifikasi hipotesis
-
----
-
-## Metodologi
-
-Sequential thinking mengikuti proses dinamis:
-
-1. **Estimasi awal**: Mulai dengan estimasi jumlah pemikiran yang diperlukan, tapi tetap fleksibel
-2. **Analisis iteratif**: Kerjakan pemikiran secara berurutan sambil membangun konteks
-3. **Kemampuan revisi**: Pertanyakan atau revisi pemikiran sebelumnya saat pemahaman makin dalam
-4. **Eksplorasi cabang**: Jelajahi pendekatan alternatif saat diperlukan
-5. **Siklus hipotesis**: Generate hipotesis, verifikasi terhadap rantai pemikiran, ulangi
-6. **Konvergensi**: Lanjutkan sampai mencapai solusi yang memuaskan
+## When to Use
+- Breaking down complex problems into manageable steps
+- Planning and design that requires iterative refinement
+- Analysis that might need course correction mid-stream
+- Problems where the full scope emerges during analysis
+- Multi-step solutions that require context across steps
+- Hypothesis generation and verification
 
 ---
 
-## Instruksi
+## Methodology
 
-### Struktur Pemikiran
+Sequential thinking follows a dynamic process:
 
-Setiap pemikiran dalam urutan harus mencakup:
-- **Nomor pemikiran** dan **estimasi total** yang mungkin berubah
-- Konten pemikiran yang jelas
-- Apakah pemikiran berikutnya diperlukan
-
-Saat merevisi pemikiran sebelumnya:
-```
-Pemikiran [N/Total]: Setelah direnungkan, asumsi di pemikiran 3 tentang X salah karena Y...
-[isRevision: true, revisesThought: 3]
-```
-
-Saat branching:
-```
-Pemikiran [N/Total]: Menjelajahi alternatif dari pemikiran X untuk pendekatan...
-[branchFromThought: X, branchId: "alternative-approach"]
-```
+1. **Initial estimate** — start with an estimate of how many thoughts are needed, but stay flexible
+2. **Iterative analysis** — work through thoughts sequentially while building context
+3. **Revision capability** — question or revise previous thoughts as understanding deepens
+4. **Branch exploration** — explore alternative approaches when needed
+5. **Hypothesis cycle** — generate hypotheses, verify against the thought chain, repeat
+6. **Convergence** — continue until reaching a satisfactory solution
 
 ---
 
-### Panduan Proses
+## Instructions
 
-**Memulai:**
-- Estimasi pemikiran yang diperlukan berdasarkan kompleksitas masalah
-- Mulai dengan pemikiran 1, bangun konteks dan pendekatan
-- Set totalThoughts secara konservatif; bisa disesuaikan nanti
+### Starting Out
+- Estimate the initial number of thoughts based on problem complexity
+- Begin with thought 1, establishing context and approach
+- Set `totalThoughts` conservatively — you can adjust as the problem's scope becomes clearer
 
-**Selama analisis:**
-- Bangun di atas pemikiran sebelumnya sambil mempertahankan konteks
-- Saring informasi yang tidak relevan di setiap langkah
-- Ungkapkan ketidakpastian saat ada
-- Jangan ragu merevisi jika menemukan kesalahan atau pendekatan yang lebih baik
-- Sesuaikan totalThoughts naik/turun seiring scope masalah makin jelas
+### During Analysis
+- Build on previous thoughts while maintaining context
+- Filter out irrelevant information at each step
+- Express uncertainty when present
+- Revise freely if you spot errors or find a better approach
 
-**Siklus hipotesis:**
-1. Generate hipotesis berdasarkan pemahaman saat ini
-2. Verifikasi terhadap rantai pemikiran sebelumnya
-3. Jika verifikasi gagal → revisi atau buat cabang baru
-4. Ulangi sampai hipotesis tervalidasi
+### Revision Pattern
+When reconsidering a previous thought:
+```
+Thought [N/Total]: On reflection, thought 3's assumption about X was incorrect because Y...
+[Revises thought 3]
+```
 
-**Penyelesaian:**
-- Hanya akhiri saat benar-benar puas dengan solusinya
-- Berikan satu jawaban akhir yang jelas
-- Pastikan jawaban langsung menjawab masalah asli
+### Branching Pattern
+When exploring an alternative:
+```
+Thought [N/Total]: Branching from thought X to explore an alternative approach...
+[branchFromThought: X]
+```
+
+### Hypothesis Cycle
+1. Generate a hypothesis based on current understanding
+2. Verify it against the previous thought chain
+3. If verification fails → revise or branch
+4. Repeat until the hypothesis is validated
+
+### Completion
+- Only conclude when you are genuinely satisfied with the solution
+- Provide a single, clear final answer
+- Ensure the answer directly addresses the original problem
 
 ---
 
-### Format Output
+## Output Format
 
-Presentasikan sequential thinking dalam format terstruktur:
 ```
-Pemikiran [N/Total]: [Konten pemikiran saat ini]
-[Jika revisi: "Ini merevisi pemikiran X karena..."]
-[Jika branching: "Branching dari pemikiran X untuk mengeksplorasi..."]
+Thought [N/Total]: {current thinking step}
+[If revision: "This revises thought X because..."]
+[If branching: "Branching from thought X to explore..."]
 
-[Lanjutkan ke pemikiran berikutnya jika diperlukan]
+[Continue with next thought]
 
-Solusi: [Jawaban yang jelas dan langsung untuk masalah asli]
+Solution: {clear, direct answer to the original problem}
 ```
 
 ---
 
-## Prinsip Utama
+## Key Principles
 
-- **Fleksibilitas di atas kekakuan**: Sesuaikan pendekatan seiring pemahaman makin dalam
-- **Revisi adalah kekuatan**: Mengoreksi arah menunjukkan penalaran yang baik
-- **Berbasis hipotesis**: Generate dan uji hipotesis secara iteratif
-- **Sadar konteks**: Pertahankan kesadaran pemikiran sebelumnya sambil terus maju
-- **Kejelasan saat selesai**: Berikan satu jawaban akhir yang jelas
+- **Flexibility over rigidity** — adjust your approach as understanding deepens
+- **Revision is strength** — correcting course shows good reasoning
+- **Hypothesis-driven** — generate and test hypotheses iteratively
+- **Context-aware** — maintain awareness of previous thoughts while progressing
+- **Clarity at completion** — deliver a single, clear final answer
 
-Untuk contoh konkret sequential thinking, lihat `.claude/skills/sequential-thinking/resources/examples.md`.
+For concrete examples, see `.claude/skills/sequential-thinking/resources/examples.md`.

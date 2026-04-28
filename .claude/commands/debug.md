@@ -1,111 +1,111 @@
 ---
-description: Protokol debugging sistematis - validasi root cause melalui hipotesis terstruktur. Gunakan: /debug <deskripsi-masalah>
+description: Systematic debugging protocol — validate root causes through structured hypotheses. Usage: /debug <problem-description>
 ---
 
 # Debugging Protocol
 
-Masalah yang akan di-debug: **$ARGUMENTS**
+Problem to debug: **$ARGUMENTS**
 
 ## Overview
 
-Skill ini menyediakan framework debugging sistematis yang bergerak melampaui troubleshooting ad-hoc ke proses terstruktur berupa generasi dan validasi hipotesis.
+This protocol moves beyond ad-hoc troubleshooting to a structured process of hypothesis generation and validation. Use it to systematically eliminate potential root causes before applying any fix.
 
 ---
 
-## Langkah-Langkah
+## Steps
 
-### 1. Inisialisasi Sesi
+### 1. Initialise the Session
 
-Buat dokumen debugging menggunakan template dari `.claude/skills/debugging-protocol/assets/debugging-session-template.md`.
+Create a debugging document using the template at `.claude/skills/debugging-protocol/assets/debugging-session-template.md`.
 
-**Simpan ke:** `docs/debugging/{issue-name}-{YYYY-MM-DD}-{HHmm}.md`
+**Save to:** `docs/debugging/{issue-name}-{YYYY-MM-DD}-{HHmm}.md`
 
-Buat direktori `docs/debugging/` jika belum ada. Dokumen ini bisa direferensikan dari conversation atau workflow lain.
-
----
-
-### 2. Definisikan Masalah
-
-Tuliskan dengan jelas:
-- **Symptom**: Perilaku apa yang teramati? Bagaimana berbeda dari yang diharapkan?
-- **Scope**: Komponen mana yang terlibat?
-- **Reproducibility**: Konsisten atau flaky?
+Create `docs/debugging/` if it does not exist. This document can be referenced from other conversations or workflows.
 
 ---
 
-### 3. Formulasikan Hipotesis
+### 2. Define the Problem
 
-Daftarkan hipotesis yang berbeda dan bisa diuji:
-- Hindari tebakan samar
-- Bedakan antara layer (contoh: "Frontend Hypothesis" vs "Backend Hypothesis")
-- Contoh: "Race condition di state update UI" vs "Misconfiguration schema database"
-
-**Minimal 2-3 hipotesis sebelum mulai validasi.**
+State clearly:
+- **Symptom**: What observable behaviour differs from what is expected?
+- **Scope**: Which components are involved?
+- **Reproducibility**: Is it consistent, flaky, or a one-off?
 
 ---
 
-### 4. Desain Validation Tasks
+### 3. Formulate Hypotheses
 
-Untuk setiap hipotesis, desain task validasi spesifik:
-- **Objective**: Apa yang ingin dibuktikan atau dibantah?
-- **Steps**: Tindakan tepat dan dapat direproduksi
-- **Code Pattern**: Sediakan kode atau command yang tepat untuk dijalankan
-- **Success Criteria**: Nyatakan secara eksplisit output apa yang mengkonfirmasi hipotesis
+List distinct, testable hypotheses:
+- Avoid vague guesses
+- Differentiate between layers (e.g. "Frontend Hypothesis" vs "Backend Hypothesis")
+- Example: "Race condition in UI state update" vs "Database schema misconfiguration"
 
-Contoh validasi untuk berbagai layer:
-```
-# Frontend — cek state
-console.log('state sebelum mutasi:', JSON.stringify(state))
+**Write at least 2–3 hypotheses before starting validation.**
+
+---
+
+### 4. Design Validation Tasks
+
+For each hypothesis, design a specific validation task:
+- **Objective**: What are you trying to prove or disprove?
+- **Steps**: Precise, reproducible actions
+- **Code Pattern**: The exact code or command to run
+- **Success Criteria**: Explicitly state what output confirms the hypothesis
+
+Examples:
+```bash
+# Frontend — inspect state
+console.log('state before mutation:', JSON.stringify(state))
 
 # Backend — trace request
 curl -v -H "X-Debug: true" http://localhost:8080/api/endpoint
 
-# Database — periksa data
+# Database — inspect data
 SELECT * FROM table WHERE id = 'suspect-id';
 
-# Go — tambah logging sementara
-log.Printf("DEBUG nilai: %+v", nilai)
+# Go — add temporary logging
+log.Printf("DEBUG value: %+v", value)
 ```
 
 ---
 
-### 5. Eksekusi dan Dokumentasikan
+### 5. Execute and Document
 
-Untuk setiap hipotesis:
-1. Jalankan validation task
-2. Rekam hasil aktual vs hasil yang diharapkan
-3. Tandai hipotesis: ✅ Dikonfirmasi | ❌ Dibantah | ⚠️ Tidak Meyakinkan
-4. Jika tidak meyakinkan — perbaiki task validasi dan coba ulang
+For each hypothesis:
+1. Run the validation task
+2. Record the actual result vs. the expected result
+3. Mark the hypothesis: ✅ Confirmed | ❌ Refuted | ⚠️ Inconclusive
+4. If inconclusive — refine the validation task and retry
 
 ---
 
 ### 6. Root Cause Confirmation
 
-Sebelum menyatakan root cause:
-- [ ] Apakah kamu bisa mereproduksi masalah secara konsisten?
-- [ ] Apakah hipotesis dikonfirmasi oleh lebih dari satu validation task?
-- [ ] Apakah memperbaiki root cause akan menyelesaikan symptom yang dilaporkan?
+Before declaring a root cause:
+- [ ] Can you reproduce the problem consistently?
+- [ ] Is the hypothesis confirmed by more than one validation task?
+- [ ] Would fixing this root cause resolve the reported symptom?
 
 ---
 
-### 7. Fix dan Serahkan
+### 7. Fix and Hand Off
 
-Setelah root cause dikonfirmasi:
-1. Update dokumen debugging dengan kesimpulan
-2. Perbaiki masalah menggunakan `/quick-fix` atau `/orchestrator` sesuai cakupan
-3. Tambahkan test yang mereproduksi bug (agar tidak regresi)
+Once the root cause is confirmed:
+1. Update the debugging document with the conclusion
+2. Fix using `/quick-fix` or `/orchestrator` depending on scope
+3. Add a test that reproduces the bug (to prevent regression)
 
 ---
 
-## Panduan Bahasa Spesifik
+## Language-Specific Guides
 
-Untuk debugging patterns yang lebih detail per stack:
+For more detailed debugging patterns per stack:
 - Frontend → `.claude/skills/debugging-protocol/languages/frontend.md`
 - Rust → `.claude/skills/debugging-protocol/languages/rust.md`
 
 ---
 
-## Template Dokumen Debugging
+## Debugging Document Template
 
 ```markdown
 # Debugging Session: {issue-name}
@@ -114,8 +114,8 @@ Untuk debugging patterns yang lebih detail per stack:
 
 ## Problem Statement
 **Symptom:** ...
-**Expected behavior:** ...
-**Actual behavior:** ...
+**Expected behaviour:** ...
+**Actual behaviour:** ...
 **Reproducible:** Always / Flaky / Once
 
 ## System Context
@@ -125,21 +125,21 @@ Untuk debugging patterns yang lebih detail per stack:
 
 ## Hypotheses
 
-### Hypothesis 1: {nama}
+### Hypothesis 1: {name}
 - **Claim:** ...
 - **Validation task:** ...
 - **Result:** ✅ Confirmed / ❌ Refuted / ⚠️ Inconclusive
 - **Evidence:** ...
 
-### Hypothesis 2: {nama}
+### Hypothesis 2: {name}
 ...
 
 ## Root Cause
-{Deskripsi root cause yang dikonfirmasi}
+{Confirmed root cause description}
 
 ## Fix Applied
-{Deskripsi fix yang diterapkan}
+{Description of the fix}
 
 ## Prevention
-{Apa yang bisa dilakukan agar tidak terulang?}
+{What can be done to prevent recurrence?}
 ```

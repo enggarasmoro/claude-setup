@@ -1,162 +1,161 @@
 ---
-description: Review kualitas kode terstruktur - identifikasi isu tanpa menulis fitur baru. Gunakan: /audit <path-atau-fitur>
+description: Structured code quality review — identify issues without writing new features. Usage: /audit <path-or-feature>
 ---
 
 # Audit Workflow
 
-Target audit: **$ARGUMENTS**
+Audit target: **$ARGUMENTS**
 
-## Kapan Digunakan
-- Setelah agent lain commit fitur (cross-agent review)
-- Periodic quality gate pada codebase
-- Sebelum release atau deployment
-- Saat user ingin jaminan tanpa menulis kode baru
+## When to Use
+- After another agent commits a feature (cross-agent review)
+- Periodic quality gates on the codebase
+- Before releases or deployments
+- When you want assurance without writing new code
 
-## Jangan Gunakan Untuk
-- Menulis fitur baru → `/orchestrator`
-- Memperbaiki bug yang diketahui → `/quick-fix`
-- Restrukturisasi kode → `/refactor`
+## Do Not Use For
+- Writing new features → `/orchestrator`
+- Fixing known bugs → `/quick-fix`
+- Restructuring code → `/refactor`
 
 ## Pre-Audit Checklist
-Sebelum mulai, HARUS:
-1. Baca `.claude/rules/rule-priority.md` — ini adalah kriteria review
-2. Identifikasi scope audit (fitur spesifik, modul, atau seluruh codebase)
+Before starting, you MUST:
+1. Read `.claude/rules/rule-priority.md` — these form the review criteria
+2. Identify the audit scope (specific feature, module, or full codebase)
 
 ---
 
-## Fase 1: Code Review
+## Phase 1: Code Review
 
-Review berdasarkan kategori berikut (urutan prioritas dari `rule-priority.md`):
+Review against the following categories in priority order:
 
 ### 1. Security
-- Validasi input di semua boundary
-- Tidak ada hardcoded secrets atau credentials
-- Parameterized queries (tidak ada SQL injection)
-- Pengecekan autentikasi/otorisasi yang tepat
+- Input validation at all boundaries
+- No hardcoded secrets or credentials
+- Parameterized queries (no SQL injection)
+- Proper authentication / authorisation checks
 
 ### 2. Reliability
-- Error handling di semua operasi I/O (tidak ada empty catch)
-- Semua resource dibersihkan (connections, files, locks)
-- Timeout di external calls
-- Pola graceful degradation
+- Error handling on all I/O operations (no empty catch blocks)
+- All resources cleaned up (connections, files, locks)
+- Timeouts on external calls
+- Graceful degradation patterns
 
 ### 3. Testability
-- Operasi I/O di belakang interface/abstraksi
-- Business logic murni (tanpa side effect)
-- Dependency di-inject, bukan di-hardcode
-- Test coverage di critical paths
+- I/O operations behind interfaces / abstractions
+- Business logic is pure (no side effects)
+- Dependencies injected, not hardcoded
+- Test coverage on critical paths
 
 ### 4. Observability
-- Semua entry point operasi dicatat (start/success/failure)
-- Structured logging dengan correlation IDs
-- Log level yang tepat
+- All operation entry points logged (start / success / failure)
+- Structured logging with correlation IDs
+- Appropriate log levels
 
 ### 5. Code Quality
-- Mengikuti pola codebase yang ada (>80% konsistensi)
-- Fungsi fokus dan kecil (10-50 baris)
-- Penamaan yang jelas dan mengungkap intent
-- Tidak ada duplikasi kode (DRY)
+- Follows existing codebase patterns (>80% consistency)
+- Functions are focused and small (10–50 lines)
+- Clear naming that reveals intent
+- No code duplication (DRY)
 
 ---
 
-## Fase 1.5: Cross-Boundary Review
+## Phase 1.5: Cross-Boundary Review
 
-Isu cross-boundary ada di jahitan antara komponen. Aktifkan hanya dimensi yang relevan, dan **nyatakan secara eksplisit** mana yang dilewati dan mengapa.
+Cross-boundary issues live at the seams between components. Activate only the dimensions that apply — and **explicitly state** which ones you are skipping and why.
 
-### Pilihan Dimensi
+### Dimension Selection
 
-| Dimensi | Aktifkan Saat |
-|---|---|
-| **A. Integration Contracts** | Project punya frontend dan backend |
-| **B. Database & Schema** | Project menggunakan database relasional/dokumen |
-| **C. Configuration & Environment** | Selalu — universal |
-| **D. Dependency Health** | Selalu — universal |
-| **E. Test Coverage Gaps** | Selalu — universal |
-| **F. Mobile ↔ Backend** | Project punya mobile app dan backend |
+| Dimension | Activate When |
+|-----------|---------------|
+| **A. Integration Contracts** | Project has both a frontend and a backend |
+| **B. Database & Schema** | Project uses a relational / document database |
+| **C. Configuration & Environment** | Always — universal |
+| **D. Dependency Health** | Always — universal |
+| **E. Test Coverage Gaps** | Always — universal |
+| **F. Mobile ↔ Backend** | Project has a mobile app and a backend |
 
-Di awal fase ini HARUS nyatakan:
-> "Mengaktifkan dimensi: A, B, C, D, E. Melewati F (tidak ada mobile app)."
-
----
-
-**Dimensi A: Integration Contracts** *(frontend + backend)*
-- [ ] Map setiap endpoint backend terhadap frontend adapter — flag endpoint yang tidak dipetakan
-- [ ] Verifikasi nama field, tipe, dan status code request/response cocok di kedua sisi
-- [ ] Verifikasi semua outbound HTTP calls menggunakan centralized API client
-- [ ] Buat auth coverage matrix: endpoint mana yang butuh auth, apakah frontend mengirim token?
-- [ ] Periksa error contract: apakah frontend handle semua kode error yang bisa dikembalikan backend?
-
-**Dimensi B: Database & Schema** *(project dengan database)*
-- [ ] Verifikasi semua tabel punya kolom dasar (`id`, `created_at`, `updated_at`)
-- [ ] Cek semua foreign key punya index yang sesuai
-- [ ] Cross-reference nama field struct/model terhadap nama kolom DB — flag perbedaan
-- [ ] Cek migrasi reversible (up + down) dan ikuti strategi additive-first
-- [ ] Scan storage adapters untuk pola N+1 query
-
-**Dimensi C: Configuration & Environment** *(selalu aktif)*
-- [ ] Tidak ada hardcoded secrets, token, URL, atau credentials di source code
-- [ ] `.env.template` ada dan mencakup semua env var yang direferensikan
-- [ ] Startup validation gagal cepat jika config yang diperlukan hilang
-- [ ] Secrets tidak pernah di-log
-
-**Dimensi D: Dependency Health** *(selalu aktif)*
-- [ ] Tidak ada top-level dependency yang tidak digunakan
-- [ ] Tidak ada circular dependency antara modul fitur
-- [ ] Cross-module imports hanya menggunakan public API
-- [ ] Jalankan `npm audit` / `go list -m -json all | nancy` / `cargo audit` — flag CVE severity tinggi
-
-**Dimensi E: Test Coverage Gaps** *(selalu aktif)*
-- [ ] Test handler/controller ada untuk setiap API endpoint
-- [ ] Integration test ada untuk setiap storage/database adapter
-- [ ] Setiap error path punya setidaknya satu test
-- [ ] E2E test mencakup primary user journeys
-
-**Dimensi F: Mobile ↔ Backend** *(project dengan mobile app)*
-- [ ] API version compatibility — mobile tidak memanggil endpoint yang sudah tidak ada
-- [ ] Offline data sync: conflict resolution dan retry logic dites
-- [ ] Auth token refresh flow bekerja ketika access token kadaluarsa
+At the start of this phase you MUST state:
+> "Activating dimensions: A, B, C, D, E. Skipping F (no mobile app)."
 
 ---
 
-## Fase 2: Automated Verification
+**Dimension A: Integration Contracts** *(frontend + backend)*
+- [ ] Map every backend endpoint against its frontend adapter — flag any unmapped endpoints
+- [ ] Verify request / response field names, types, and status codes match across the boundary
+- [ ] Verify all outbound HTTP calls use the project's centralised API client
+- [ ] Build an auth coverage matrix: which endpoints require auth, do frontend adapters send tokens?
+- [ ] Check error contract alignment: does the frontend handle the full set of error codes the backend can return?
 
-Jalankan full validation suite:
+**Dimension B: Database & Schema** *(projects with a database)*
+- [ ] Verify all tables have required base columns (`id`, `created_at`, `updated_at`)
+- [ ] Check all foreign keys have corresponding indexes
+- [ ] Cross-reference struct / model field names against actual DB column names — flag drift
+- [ ] Check migrations are reversible (up + down) and follow the additive-first strategy
+- [ ] Scan storage adapters for N+1 query patterns
+
+**Dimension C: Configuration & Environment** *(always active)*
+- [ ] No hardcoded secrets, tokens, URLs, or credentials in source code
+- [ ] `.env.template` exists and covers every env var referenced in the codebase
+- [ ] Startup validation fails fast on missing required config
+- [ ] Secrets are never logged
+
+**Dimension D: Dependency Health** *(always active)*
+- [ ] No unused top-level dependencies
+- [ ] No circular dependencies between feature modules
+- [ ] Cross-module imports only use each module's public API
+- [ ] Run `npm audit` / `go list -m -json all | nancy` / `cargo audit` — flag high-severity CVEs
+
+**Dimension E: Test Coverage Gaps** *(always active)*
+- [ ] A handler / controller test exists for every API endpoint
+- [ ] An integration test exists for every storage / database adapter
+- [ ] Every error path has at least one test that exercises it
+- [ ] E2E tests cover the primary user journeys
+
+**Dimension F: Mobile ↔ Backend** *(projects with a mobile app)*
+- [ ] API version compatibility — mobile must not call endpoints that no longer exist
+- [ ] Offline data sync: conflict resolution and retry logic are tested
+- [ ] Auth token refresh flows work when the access token expires mid-session
+
+---
+
+## Phase 2: Automated Verification
+
+Run the full validation suite:
 ```bash
-# Sesuaikan dengan stack
-# Go: go vet ./... && golangci-lint run && go test ./... -cover
+# Go:         go vet ./... && golangci-lint run && go test ./... -cover
 # TypeScript: tsc --noEmit && eslint . && vitest run --coverage
-# Python: mypy . && ruff check . && pytest --cov
+# Python:     mypy . && ruff check . && pytest --cov
 ```
 
 ---
 
-## Fase 3: Findings Report
+## Phase 3: Findings Report
 
-**Simpan laporan ke:** `docs/audits/review-findings-{feature}-{YYYY-MM-DD}-{HHmm}.md`
+**Save to:** `docs/audits/review-findings-{feature}-{YYYY-MM-DD}-{HHmm}.md`
 
-> **Zero-Findings Guard:** Jika audit menghasilkan kurang dari 3 temuan, HARUS lengkapi bagian "Dimensions Covered" sebelum menyatakan hasil bersih.
+> **Zero-Findings Guard:** If the audit produces fewer than 3 findings, you MUST complete the "Dimensions Covered" section before declaring a clean result.
 
 ```markdown
-# Code Audit: {Feature/Module Name}
+# Code Audit: {Feature / Module Name}
 Date: {date}
 
 ## Summary
 - **Files reviewed:** N
 - **Issues found:** N (X critical, Y major, Z minor)
 - **Test coverage:** N%
-- **Dimensions activated:** A, B, C, D, E (list mana yang dilewati dan alasannya)
+- **Dimensions activated:** A, B, C, D, E (list which were skipped and why)
 
 ## Critical Issues
-Issues yang harus diperbaiki sebelum deployment.
-- [ ] {deskripsi} — {file}:{line}
+Issues that must be fixed before deployment.
+- [ ] {description} — {file}:{line}
 
 ## Major Issues
-Issues yang sebaiknya diperbaiki dalam waktu dekat.
-- [ ] {deskripsi} — {file}:{line}
+Issues that should be fixed in the near term.
+- [ ] {description} — {file}:{line}
 
 ## Minor Issues
-Style, naming, atau perbaikan kecil.
-- [ ] {deskripsi} — {file}:{line}
+Style, naming, or minor improvements.
+- [ ] {description} — {file}:{line}
 
 ## Verification Results
 - Lint: PASS/FAIL
@@ -165,32 +164,30 @@ Style, naming, atau perbaikan kecil.
 - Coverage: N%
 
 ## Dimensions Covered
-| Dimensi | Status | File / Query yang Diperiksa |
-|---|---|---|
-| A. Integration Contracts | ✅ Checked / ⏭ Skipped (alasan) | ... |
-| B. Database & Schema | ✅ Checked / ⏭ Skipped (alasan) | ... |
-| C. Configuration & Environment | ✅ Checked | ... |
-| D. Dependency Health | ✅ Checked | ... |
-| E. Test Coverage Gaps | ✅ Checked | ... |
-| F. Mobile ↔ Backend | ⏭ Skipped | Tidak ada mobile app |
+| Dimension | Status | Files / Queries Examined |
+|-----------|--------|--------------------------|
+| A. Integration Contracts | ✅ Checked / ⏭ Skipped (reason) | ... |
+| B. Database & Schema     | ✅ Checked / ⏭ Skipped (reason) | ... |
+| C. Configuration & Env   | ✅ Checked | ... |
+| D. Dependency Health     | ✅ Checked | ... |
+| E. Test Coverage Gaps    | ✅ Checked | ... |
+| F. Mobile ↔ Backend      | ⏭ Skipped | No mobile app |
 ```
 
 ---
 
 ## Feedback Loop
 
-Setelah audit menghasilkan temuan:
-
-| Tipe Temuan | Contoh | Workflow |
+| Finding Type | Example | Workflow |
 |---|---|---|
-| **Nit/minor** (naming, formatting) | "Rename `x` ke `userCount`" | Perbaiki langsung di sini |
-| **Fix kecil terisolasi** (log hilang, error handling) | "Tambah validasi input di handler" | `/quick-fix` di conversation baru |
-| **Perubahan struktural** (abstraksi salah, interface hilang) | "Storage tidak di belakang interface" | `/refactor` di conversation baru |
-| **Kapabilitas hilang** (endpoint baru, auth check) | "Tidak ada auth middleware di admin routes" | `/orchestrator` di conversation baru |
+| **Nit / minor** (naming, formatting) | "Rename `x` to `userCount`" | Fix inline |
+| **Small isolated fix** (missing log, validation) | "Add input validation on handler" | `/quick-fix` in a new conversation |
+| **Structural change** (wrong abstraction, missing interface) | "Storage not behind an interface" | `/refactor` in a new conversation |
+| **Missing capability** (new endpoint, auth check) | "No auth middleware on admin routes" | `/orchestrator` in a new conversation |
 
 ---
 
 ## Completion Criteria
-- [ ] Semua file/fitur yang ditentukan telah direview
-- [ ] Full verification suite dijalankan
-- [ ] Findings document disimpan ke `docs/audits/` di repo
+- [ ] All specified files / features reviewed
+- [ ] Full verification suite run
+- [ ] Findings document saved to `docs/audits/` in the repo

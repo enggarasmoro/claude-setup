@@ -1,8 +1,8 @@
 # ANTIGRAVITY Project
 
-## Aturan yang Selalu Aktif
+## Always-On Rules
 
-Rules berikut berlaku di **semua** pekerjaan tanpa pengecualian. Baca dan ikuti secara ketat.
+The following rules apply to **all work** without exception. Read and follow them strictly.
 
 @.claude/rules/rule-priority.md
 @.claude/rules/rugged-software-constitution.md
@@ -19,30 +19,30 @@ Rules berikut berlaku di **semua** pekerjaan tanpa pengecualian. Baca dan ikuti 
 
 ---
 
-## Aturan Kontekstual (Baca Saat Relevan)
+## Contextual Rules (Read When Relevant)
 
-Rules berikut hanya diterapkan saat relevan dengan tugas:
+The following rules apply only when relevant to the current task:
 
 - Error handling → `.claude/rules/error-handling-principles.md`
 - Testing → `.claude/rules/testing-strategy.md`
-- Security (detail) → `.claude/rules/security-principles.md`
+- Security (detailed) → `.claude/rules/security-principles.md`
 - Database → `.claude/rules/database-design-principles.md`
 - API design → `.claude/rules/api-design-principles.md`
 - Git workflow → `.claude/rules/git-workflow-principles.md`
 - Performance → `.claude/rules/performance-optimization-principles.md`
-- Resources/memory → `.claude/rules/resources-and-memory-management-principles.md`
+- Resources / memory → `.claude/rules/resources-and-memory-management-principles.md`
 - Dependency management → `.claude/rules/dependency-management-principles.md`
 - Configuration → `.claude/rules/configuration-management-principles.md`
 - Feature flags → `.claude/rules/feature-flags-principles.md`
 - CI/CD → `.claude/rules/ci-cd-principles.md`
 - CI/CD + GitOps/K8s → `.claude/rules/ci-cd-gitops-kubernetes.md`
-- Monitoring/alerting → `.claude/rules/monitoring-and-alerting-principles.md`
+- Monitoring / alerting → `.claude/rules/monitoring-and-alerting-principles.md`
 - Accessibility → `.claude/rules/accessibility-principles.md`
 - Data serialization → `.claude/rules/data-serialization-and-interchange-principles.md`
-- Concurrency (detail) → `.claude/rules/concurrency-and-threading-principles.md`
-- Logging (detail) → `.claude/rules/logging-and-observability-principles.md`
+- Concurrency (detailed) → `.claude/rules/concurrency-and-threading-principles.md`
+- Logging (detailed) → `.claude/rules/logging-and-observability-principles.md`
 
-### Idiom per Bahasa
+### Language Idioms
 - Go → `.claude/rules/go-idioms-and-patterns.md`
 - TypeScript → `.claude/rules/typescript-idioms-and-patterns.md`
 - Vue → `.claude/rules/vue-idioms-and-patterns.md`
@@ -50,25 +50,25 @@ Rules berikut hanya diterapkan saat relevan dengan tugas:
 - Rust → `.claude/rules/rust-idioms-and-patterns.md`
 - Flutter → `.claude/rules/flutter-idioms-and-patterns.md`
 
-### Struktur Project per Stack
+### Project Structure per Stack
 - Go backend → `.claude/rules/project-structure-go-backend.md`
 - Vue frontend → `.claude/rules/project-structure-vue-frontend.md`
 - Python backend → `.claude/rules/project-structure-python-backend.md`
 - Flutter mobile → `.claude/rules/project-structure-flutter-mobile.md`
-- Rust/Cargo → `.claude/rules/project-structure-rust-cargo.md`
+- Rust / Cargo → `.claude/rules/project-structure-rust-cargo.md`
 
 ---
 
-## Perintah Tersedia (Custom Slash Commands)
+## Available Commands
 
-| Perintah | Deskripsi |
-|---|---|
-| `/orchestrator` | Workflow lengkap 5-fase untuk fitur baru |
-| `/quick-fix` | Perbaikan bug kecil dan hotfix cepat |
-| `/refactor` | Restrukturisasi kode yang aman |
-| `/audit` | Review kualitas kode terstruktur |
-| `/perf-optimize` | Optimasi performa berbasis profiling |
-| `/adr` | Buat Architecture Decision Record |
-| `/debug` | Protokol debugging sistematis |
-| `/code-review` | Review kode dengan checklist severity |
-| `/sequential-thinking` | Analisis iteratif untuk masalah kompleks |
+| Command | Description |
+|---------|-------------|
+| `/orchestrator` | Full 5-phase workflow for new features |
+| `/quick-fix` | Fast bug fixes and hotfixes |
+| `/refactor` | Safe code restructuring |
+| `/audit` | Structured code quality review |
+| `/perf-optimize` | Profile-driven performance optimization |
+| `/adr` | Create an Architecture Decision Record |
+| `/debug` | Systematic debugging protocol |
+| `/code-review` | Code review with severity checklist |
+| `/sequential-thinking` | Iterative analysis for complex problems |

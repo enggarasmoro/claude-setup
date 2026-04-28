@@ -1,65 +1,65 @@
 ---
-description: Review kode terstruktur terhadap full rule set - gunakan saat audit atau review kode dari agent lain. Gunakan: /code-review <file-atau-fitur>
+description: Structured code review against the full rule set. Usage: /code-review <file-or-feature>
 ---
 
-# Code Review Skill
+# Code Review
 
-Target review: **$ARGUMENTS**
+Review target: **$ARGUMENTS**
 
-## Kapan Digunakan
-- Selama workflow `/audit` (Fase 1: Code Review)
-- Saat user meminta code review di luar workflow
-- **Best practice:** Invoke di conversation baru (bukan yang sama dengan yang menulis kode) untuk menghindari confirmation bias
+## When to Use
+- During the `/audit` workflow (Phase 1: Code Review)
+- When a standalone code review is requested
+- **Best practice:** Invoke in a fresh conversation (not the one that authored the code) to avoid confirmation bias
 
 ---
 
-## Proses Review
+## Review Process
 
-### 1. Tentukan Scope
+### 1. Define the Scope
 
-Identifikasi file/fitur yang akan direview:
-- **Feature review** — semua file di direktori fitur
-- **PR review** — hanya file yang berubah
-- **Full codebase audit** — semua fitur
+Identify the files / feature to review:
+- **Feature review** — all files in a feature directory
+- **PR review** — only changed files
+- **Full codebase audit** — all features
 
-### 2. Load Rule Set
+### 2. Load the Rule Set
 
-Baca rules yang berlaku dari `.claude/rules/`. Gunakan `.claude/rules/rule-priority.md` untuk klasifikasi severity.
+Read the applicable rules from `.claude/rules/`. Use `.claude/rules/rule-priority.md` for severity classification.
 
-Untuk bahasa yang direview, load anti-pattern spesifik:
+For the language(s) under review, load the anti-pattern checklist:
 - Go → `.claude/skills/code-review/languages/go.md`
 
-### 3. Kategori Review (Urutan Prioritas)
+### 3. Review Categories (Priority Order)
 
-#### Critical (Harus Diperbaiki)
+#### Critical (Must Fix)
 - **Security** `[SEC]` — injection, hardcoded secrets, broken auth
-- **Data loss** `[DATA]` — error handling hilang pada writes, tidak ada transaction boundary
-- **Resource leaks** `[RES]` — koneksi tidak ditutup, cleanup hilang
+- **Data loss** `[DATA]` — missing error handling on writes, no transaction boundaries
+- **Resource leaks** `[RES]` — unclosed connections, missing cleanup
 
-#### Major (Sebaiknya Diperbaiki)
-- **Testability** `[TEST]` — I/O tidak di belakang interface, error path tidak dites
-- **Observability** `[OBS]` — logging hilang pada operasi, tidak ada correlation ID
+#### Major (Should Fix)
+- **Testability** `[TEST]` — I/O not behind interfaces, untested error paths
+- **Observability** `[OBS]` — missing logging on operations, no correlation IDs
 - **Error handling** `[ERR]` — empty catch blocks, swallowed errors
-- **Architecture** `[ARCH]` — circular dependency, akses layer yang salah
+- **Architecture** `[ARCH]` — circular dependencies, wrong layer access
 
-#### Minor (Bagus jika Diperbaiki)
-- **Pattern consistency** `[PAT]` — penyimpangan dari pola codebase yang ada
-- **Naming** — nama variabel/fungsi yang tidak jelas
-- **Code organization** — fungsi terlalu panjang, tanggung jawab tercampur
+#### Minor (Nice to Fix)
+- **Pattern consistency** `[PAT]` — deviation from established codebase patterns
+- **Naming** — unclear variable / function names
+- **Code organisation** — functions too long, mixed responsibilities
 
-#### Nit (Opsional)
-- **Style** — masalah formatting yang seharusnya ditangani linter
-- **Documentation** — komentar hilang pada logika kompleks
+#### Nit (Optional)
+- **Style** — formatting issues the linter would catch
+- **Documentation** — missing comments on complex logic
 
 ---
 
-### 4. Hasilkan Findings
+### 4. Produce Findings
 
-Output findings dalam format terstruktur:
+Output findings in a structured format:
 
 ```markdown
-# Code Review: {Feature/Module Name}
-Date: {tanggal}
+# Code Review: {Feature / Module Name}
+Date: {date}
 Reviewer: AI Agent (fresh context)
 
 ## Summary
@@ -67,43 +67,39 @@ Reviewer: AI Agent (fresh context)
 - **Issues found:** N (X critical, Y major, Z minor, W nit)
 
 ## Critical Issues
-- [ ] **[SEC]** {deskripsi} — {file}:{line}
-- [ ] **[DATA]** {deskripsi} — {file}:{line}
+- [ ] **[SEC]** {description} — {file}:{line}
+- [ ] **[DATA]** {description} — {file}:{line}
 
 ## Major Issues
-- [ ] **[TEST]** {deskripsi} — {file}:{line}
-- [ ] **[OBS]** {deskripsi} — {file}:{line}
+- [ ] **[TEST]** {description} — {file}:{line}
+- [ ] **[OBS]** {description} — {file}:{line}
 
 ## Minor Issues
-- [ ] **[PAT]** {deskripsi} — {file}:{line}
+- [ ] **[PAT]** {description} — {file}:{line}
 
 ## Nit
-- [ ] {deskripsi} — {file}:{line}
+- [ ] {description} — {file}:{line}
 
 ## Rules Applied
-Daftar rules yang direferensikan selama review ini.
+List of rules referenced during this review.
 ```
 
 ---
 
-### 5. Simpan Laporan
+### 5. Save the Report
 
-Saat dipanggil via workflow `/audit`, laporan **HARUS** disimpan ke repo:
+When invoked via `/audit`, the report **MUST** be saved to the repo:
 
 **Path:** `docs/audits/review-findings-{feature}-{YYYY-MM-DD}-{HHmm}.md`
 
-1. Buat `docs/audits/` jika belum ada
-2. Tulis findings ke path tersebut
-3. Ini membuat laporan dapat diakses dari conversation dan agent lain
-
-Saat dipanggil standalone (di luar `/audit`), menyimpan ke `docs/audits/` direkomendasikan tapi opsional.
+When invoked standalone, saving is recommended but optional.
 
 ---
 
 ### 6. Severity Tags
 
-| Tag | Kategori | Sumber Rule |
-|---|---|---|
+| Tag | Category | Rule source |
+|-----|----------|-------------|
 | `[SEC]` | Security | `.claude/rules/security-principles.md` |
 | `[DATA]` | Data integrity | `.claude/rules/error-handling-principles.md` |
 | `[RES]` | Resource leak | `.claude/rules/resources-and-memory-management-principles.md` |
@@ -120,4 +116,4 @@ Saat dipanggil standalone (di luar `/audit`), menyimpan ke `docs/audits/` direko
 
 ### 7. Zero-Findings Guard
 
-Jika review menghasilkan kurang dari 3 temuan, HARUS buat bagian "Dimensions Covered" dalam findings document yang mencantumkan setiap dimensi cross-boundary dan file atau query spesifik yang diperiksa. Baru bisa menyatakan hasil bersih.
+If this review produces fewer than 3 findings, you MUST produce a "Dimensions Covered" attestation section listing each cross-boundary dimension and the specific files or queries examined before declaring a clean result.

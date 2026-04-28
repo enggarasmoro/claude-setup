@@ -1,174 +1,174 @@
 ---
-description: Workflow lengkap 5-fase untuk membangun fitur baru - riset → implementasi → integrasi → verifikasi → commit
+description: Full 5-phase workflow for new features — research → implement → integrate → verify → ship
 ---
 
 # Build Feature Workflow
 
-**INSTRUKSI KRITIS**
+**CRITICAL INSTRUCTION**
 
-KAMU DILARANG KERAS MELEWATI FASE.
-Perlakukan file ini sebagai State Machine. Kamu tidak bisa transisi ke fase $N+1$ sebelum fase $N$ selesai sepenuhnya dan diverifikasi.
+YOU ARE FORBIDDEN FROM SKIPPING PHASES.
+Treat this file as a state machine. You cannot transition to phase $N+1$ until phase $N$ is fully complete and verified.
 
-## Peran
-Kamu adalah Senior Principal Engineer dengan mandat kepatuhan protokol yang ketat.
+## Role
 
-Sebelum memulai apapun, kamu HARUS:
-1. Baca `.claude/rules/rule-priority.md`
-2. Identifikasi rules yang berlaku untuk tugas ini
-3. Baca file rules yang relevan (mereka adalah constraint non-negosiabel)
+You are a Senior Principal Engineer with a mandate for strict protocol adherence.
+
+Before starting any work, you MUST:
+1. Read `.claude/rules/rule-priority.md`
+2. Identify which rules apply to this task
+3. Read the relevant rule files — they are non-negotiable constraints
 
 ---
 
-## Fase Workflow
+## Workflow Phases
 
 ```
 Research → Implement → Integrate → [E2E?] → Verify → Ship
 ```
 
-Setiap fase harus selesai sebelum lanjut. Jangan trade-off quality gate demi kecepatan.
+Every phase must complete before proceeding. Never trade quality gates for velocity.
 
 ---
 
-### Fase 1: Research
-**Rules wajib:** `.claude/rules/project-structure.md`, `.claude/rules/architectural-pattern.md`
+### Phase 1: Research
+**Required rules:** `.claude/rules/project-structure.md`, `.claude/rules/architectural-pattern.md`
 
-1. Analisis permintaan — apa yang diminta, apa scope-nya?
-2. Review implementasi saat ini di repository
-3. Cari dokumentasi eksternal menggunakan WebSearch/WebFetch jika diperlukan
-4. Buat `task.md` yang mendefinisikan scope
-5. Simpan temuan di `docs/research_logs/{feature}.md`
-6. Jika ada keputusan arsitektur signifikan → jalankan `/adr`
+1. Analyse the request — what is being asked, what is the scope?
+2. Review the current codebase for existing patterns and dependencies
+3. Search external documentation using WebSearch / WebFetch if needed
+4. Create `task.md` defining the scope and acceptance criteria
+5. Save findings to `docs/research_logs/{feature}.md`
+6. If a significant architecture decision is needed → run `/adr`
 
-**Skills:** Gunakan `/debug` jika ada ambiguitas teknis yang perlu diselesaikan.
-
-**Gate:** `task.md` dan research log harus ada sebelum lanjut.
+**Gate:** `task.md` and research log must exist before proceeding.
 
 ---
 
-### Fase 2: Implement
-**Rules wajib:** `.claude/rules/error-handling-principles.md`, `.claude/rules/logging-and-observability-mandate.md`, `.claude/rules/testing-strategy.md`
+### Phase 2: Implement
+**Required rules:** `.claude/rules/error-handling-principles.md`, `.claude/rules/logging-and-observability-mandate.md`, `.claude/rules/testing-strategy.md`
 
-1. Ikuti siklus TDD: **Red → Green → Refactor**
-2. Buat file test terlebih dahulu (co-located dengan implementasi):
+1. Follow the TDD cycle: **Red → Green → Refactor**
+2. Create the test file first (co-located with the implementation):
    - Go: `*_test.go`
    - TypeScript: `*.spec.ts`
-3. Tulis failing test → implementasi → buat test hijau → refactor
-4. Unit test dengan mocked dependencies
+3. Write failing test → implement → make test pass → refactor
+4. Unit tests must use mocked dependencies
 
-**Gate:** Unit test harus lulus sebelum lanjut ke Fase 3.
-
----
-
-### Fase 3: Integrate
-**Rules wajib:** `.claude/rules/testing-strategy.md`, `.claude/rules/resources-and-memory-management-principles.md`
-
-WAJIB jika ANY dari berikut ini benar:
-- [ ] File storage/repository dimodifikasi atau dibuat
-- [ ] File external API client dimodifikasi atau dibuat
-- [ ] Database query atau schema diubah
-- [ ] Message queue, cache, atau I/O adapter disentuh
-
-**BOLEH SKIP** hanya jika SEMUA kondisi di atas TIDAK terpenuhi (dan harus didokumentasikan alasannya).
-
-1. Tulis integration test dengan infrastruktur nyata (Testcontainers jika tersedia)
-2. Test adapter terhadap infrastruktur real
-
-**Gate:** Integration test harus lulus.
+**Gate:** All unit tests must pass before proceeding to Phase 3.
 
 ---
 
-### Fase 3.5: E2E Validation (Kondisional)
-**Diperlukan jika:**
-- Komponen UI ditambahkan atau dimodifikasi
-- API endpoint ditambahkan/dimodifikasi yang berinteraksi dengan frontend
-- Critical user-facing flows diubah
+### Phase 3: Integrate
+**Required rules:** `.claude/rules/testing-strategy.md`, `.claude/rules/resources-and-memory-management-principles.md`
 
-**BOLEH SKIP jika:**
-- Perubahan pure backend/infrastructure
+REQUIRED if ANY of the following are true:
+- [ ] Storage / repository files were modified or created
+- [ ] External API client files were modified or created
+- [ ] Database queries or schema were changed
+- [ ] Message queue, cache, or I/O adapter code was touched
+
+**MAY SKIP** only if ALL of the above are false — and the reason must be documented.
+
+1. Write integration tests against real infrastructure (Testcontainers if available)
+2. Test adapters against a real database or service
+
+**Gate:** Integration tests must pass.
+
+---
+
+### Phase 3.5: E2E Validation (Conditional)
+**Required when:**
+- UI components were added or modified
+- API endpoints were added / modified that interact with the frontend
+- Critical user-facing flows were changed
+
+**May skip when:**
+- Pure backend / infrastructure changes
 - Internal library refactoring
-- Perubahan test-only
+- Test-only changes
 
-Gunakan Playwright atau tool E2E yang tersedia. Minimal satu critical user journey harus dites.
+Use Playwright or the available E2E tool. At least one critical user journey must be tested.
 
-**Gate:** Setidaknya satu critical user journey dites dan lulus.
+**Gate:** At least one critical user journey passes.
 
 ---
 
-### Fase 4: Verify
-**Rules wajib:** `.claude/rules/code-completion-mandate.md` + semua mandate yang berlaku
+### Phase 4: Verify
+**Required rules:** `.claude/rules/code-completion-mandate.md` + all applicable mandates
 
-Jalankan full validation suite:
+Run the full validation suite:
 ```bash
-# Sesuaikan dengan stack yang digunakan
-# Go: go vet ./... && golangci-lint run && go test ./... -cover
-# TypeScript: tsc --noEmit && eslint . && vitest run --coverage
-# Python: mypy . && ruff check . && pytest --cov
+# Go
+go vet ./... && golangci-lint run && go test ./... -cover
+
+# TypeScript
+tsc --noEmit && eslint . && vitest run --coverage
+
+# Python
+mypy . && ruff check . && pytest --cov
 ```
 
-Checklist sebelum lanjut:
-- [ ] Apakah file storage/database adapter dimodifikasi? → Fase 3 WAJIB
-- [ ] Apakah ada perubahan UI? → Fase 3.5 WAJIB
-- [ ] Lint lulus?
-- [ ] Semua test lulus?
-- [ ] Build berhasil?
-- [ ] Coverage tidak turun?
+Checklist before proceeding:
+- [ ] Were any storage / database adapter files modified? → Phase 3 REQUIRED
+- [ ] Were any UI changes made? → Phase 3.5 REQUIRED
+- [ ] Lint passes?
+- [ ] All tests pass?
+- [ ] Build succeeds?
+- [ ] Coverage did not drop?
 
-**Gate:** SEMUA linter, test, dan build harus lulus. Jika ada yang gagal — perbaiki dulu, jangan lanjut.
+**Gate:** ALL linters, tests, and builds must pass. If anything fails — fix it first, do not proceed.
 
 ---
 
-### Fase 5: Ship (Commit)
-**Rules wajib:** `.claude/rules/git-workflow-principles.md`
+### Phase 5: Ship
+**Required rules:** `.claude/rules/git-workflow-principles.md`
 
 ```bash
 git status
 git diff --staged
-git add <file-spesifik>  # Jangan git add . sembarangan
-git commit -m "feat(<scope>): <deskripsi>
-
-<body jika perlu>"
+git add <specific-files>   # never blindly git add .
+git commit -m "feat(<scope>): <description>"
 ```
 
-Format conventional commit:
-- `feat(scope): deskripsi` — fitur baru
-- `fix(scope): deskripsi` — bug fix
-- `refactor(scope): deskripsi` — refactoring
-- `test(scope): deskripsi` — penambahan test
-- `docs(scope): deskripsi` — dokumentasi
+Conventional commit types:
+- `feat(scope): description` — new feature
+- `fix(scope): description` — bug fix
+- `refactor(scope): description` — refactoring
+- `test(scope): description` — adding tests
+- `docs(scope): description` — documentation
 
-Update `task.md`: tandai semua item sebagai `[x]`.
-
----
-
-## Manajemen Task.md
-
-Status marker:
-- `[ ]` = Belum dimulai
-- `[/]` = Sedang dikerjakan (tandai saat **mulai**)
-- `[x]` = Selesai (tandai **hanya setelah Fase 4 lulus**)
-
-**Aturan:** Jangan pernah tandai `[x]` sebelum Fase 4 (Verify) lulus.
+Update `task.md`: mark all items as `[x]`.
 
 ---
 
-## Penanganan Error
+## task.md Status Markers
 
-Jika sebuah fase gagal:
-1. **Dokumentasikan kegagalan** di task summary
-2. **Jangan lanjut** ke fase berikutnya
-3. **Perbaiki masalah** di dalam fase saat ini
-4. **Jalankan ulang** kriteria completion fase tersebut
-5. Baru lanjut
+- `[ ]` = Not started
+- `[/]` = In progress (mark when **starting**)
+- `[x]` = Complete (mark **only after Phase 4 passes**)
+
+**Rule:** Never mark `[x]` before Phase 4 (Verify) passes.
 
 ---
 
-## Ringkasan Quick Reference
+## Error Handling
 
-| Fase | Output | Blocking |
-|---|---|---|
-| Research | `task.md` + `docs/research_logs/*.md` | Ya |
-| Implement | Unit tests + kode | Ya |
-| Integrate | Integration tests | Ya (untuk adapters) |
-| E2E (kondisional) | E2E tests | Ya (saat diperlukan) |
-| Verify | Semua check lulus | Ya |
-| Ship | Git commit | Ya |
+If a phase fails:
+1. **Document the failure** in the task summary
+2. **Do not proceed** to the next phase
+3. **Fix the issue** within the current phase
+4. **Re-run** the phase completion criteria
+5. Then proceed
+
+---
+
+## Quick Reference
+
+| Phase | Output | Blocking |
+|-------|--------|----------|
+| Research | `task.md` + `docs/research_logs/*.md` | Yes |
+| Implement | Unit tests + code | Yes |
+| Integrate | Integration tests | Yes (for adapters) |
+| E2E (conditional) | E2E tests | Yes (when required) |
+| Verify | All checks pass | Yes |
+| Ship | Git commit | Yes |
