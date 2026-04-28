@@ -1,329 +1,297 @@
-# ANTIGRAVITY — Claude Code Configuration
+# claude-setup
 
-Konfigurasi lengkap untuk Claude Code yang mengadaptasi standar engineering. Mencakup aturan coding, workflow pengembangan, dan skill yang bisa dipanggil via slash command.
-
----
-
-## Prasyarat
-
-- **Claude Code** versi terbaru sudah terinstall
-- Untuk cek versi: `claude --version`
-- Untuk install/update: `npm install -g @anthropic-ai/claude-code`
+A Claude Code configuration kit that brings structured engineering standards to every project. Includes always-on coding rules, reusable workflows, and slash commands — all ready to use out of the box.
 
 ---
 
-## Cara Kerja Sistem Ini
-
-Sistem ini terdiri dari 3 lapisan:
-
-```
-CLAUDE.md           → Dimuat otomatis setiap kali Claude Code dibuka di project
-.claude/rules/      → 42 file aturan coding (selalu aktif & kontekstual)
-.claude/commands/   → 9 slash command yang bisa dipanggil kapan saja
-.claude/skills/     → Aset pendukung (template, script, panduan bahasa)
-```
-
-### Bagaimana CLAUDE.md Bekerja
-
-Claude Code otomatis membaca `CLAUDE.md` setiap kali sesi baru dimulai di direktori tersebut. File ini menggunakan sintaks `@path/to/file` untuk mengimpor konten file lain — sehingga 12 aturan inti (`always-on rules`) langsung masuk ke konteks Claude tanpa perlu dipanggil manual.
-
-### Bagaimana Rules Bekerja
-
-| Tipe | Lokasi | Kapan Aktif |
-|------|--------|-------------|
-| **Always-On** (12 rules) | Di-import via `CLAUDE.md` | Setiap saat, tanpa perlu dipanggil |
-| **Contextual** (30 rules) | `.claude/rules/` | Direferensikan oleh command saat relevan |
-
-### Bagaimana Commands Bekerja
-
-File `.md` di `.claude/commands/` menjadi slash command. Ketik `/nama-command` di Claude Code untuk memanggilnya. Claude akan membaca isi file tersebut sebagai instruksi.
-
----
-
-## Opsi 1: Penggunaan Per-Project (Direkomendasikan)
-
-Pendekatan ini membuat konfigurasi terisolasi per project — ideal jika setiap project punya standar yang berbeda, atau kamu ingin mencoba dulu sebelum pakai global.
-
-### Langkah Setup
-
-**1. Salin konfigurasi ke project kamu**
+## Quick Install
 
 ```bash
-# Dari direktori project kamu
-cp -r /path/ke/ANTIGRAVITY/CLAUDE.md ./CLAUDE.md
-cp -r /path/ke/ANTIGRAVITY/.claude ./.claude
+# Install into the current directory
+npx claude-setup
+
+# Install into a specific project
+npx claude-setup ./my-project
+
+# Overwrite an existing installation without prompting
+npx claude-setup --force
+
+# Install globally (applies to all projects on your machine)
+npx claude-setup --global
 ```
 
-Atau jika kamu clone repo ini:
+---
+
+## Prerequisites
+
+- **Node.js** >= 16.7.0
+- **Claude Code** latest version installed
+  - Check version: `claude --version`
+  - Install / update: `npm install -g @anthropic-ai/claude-code`
+
+---
+
+## How It Works
+
+The kit is composed of three layers:
+
+```
+CLAUDE.md           → Auto-loaded every time Claude Code opens in a project
+.claude/rules/      → 42 coding rule files (always-on & contextual)
+.claude/commands/   → 9 slash commands callable at any time
+.claude/skills/     → Supporting assets (templates, scripts, language guides)
+```
+
+### How `CLAUDE.md` works
+
+Claude Code reads `CLAUDE.md` automatically at the start of every session in that directory. It uses `@path/to/file` syntax to import other files inline — so the 12 always-on rules are loaded into Claude's context without any manual action.
+
+### How rules work
+
+| Type | Location | When active |
+|------|----------|-------------|
+| **Always-on** (12 rules) | Imported via `CLAUDE.md` | Every session, no action needed |
+| **Contextual** (30 rules) | `.claude/rules/` | Read by commands when relevant |
+
+### How commands work
+
+Each `.md` file in `.claude/commands/` becomes a slash command. Type `/command-name` in Claude Code to invoke it — Claude reads the file as instructions for that task.
+
+---
+
+## Option 1: Per-Project Installation (Recommended)
+
+Isolated configuration per project — ideal when each project has different stack requirements, or when you want to try it out before going global.
+
+### Via npx (easiest)
 
 ```bash
-git clone <repo-url> ANTIGRAVITY
 cd my-project
-cp -r ../ANTIGRAVITY/CLAUDE.md .
-cp -r ../ANTIGRAVITY/.claude .
+npx claude-setup
+
+# If .claude/ already exists and you want to overwrite
+npx claude-setup --force
 ```
 
-**2. Sesuaikan CLAUDE.md dengan project kamu**
+### Manual (clone from source)
 
-Buka `CLAUDE.md` dan ganti bagian header:
+```bash
+git clone https://github.com/enggarasmoro/claude-setup.git
+
+cd my-project
+cp -r ../claude-setup/CLAUDE.md .
+cp -r ../claude-setup/.claude .
+```
+
+### Customize `CLAUDE.md` (optional)
+
+Open `CLAUDE.md` and update the project name at the top:
 
 ```markdown
-# ANTIGRAVITY Project          ← ganti dengan nama project kamu
+# My Project Name      ← replace this
 ```
 
-Jika project kamu tidak pakai semua stack, kamu bisa hapus bagian yang tidak relevan di "Aturan Kontekstual". Misalnya, jika project kamu pure Go, hapus bagian idiom Vue, Flutter, Rust.
+If your project only uses one stack (e.g. pure Go), you can remove the irrelevant entries from the "Contextual Rules" section. Unused contextual rules have no overhead — but trimming them keeps the file clean.
 
-**3. Buka Claude Code di direktori project**
+### Open Claude Code
 
 ```bash
-cd my-project
 claude
 ```
 
-Claude Code akan otomatis membaca `CLAUDE.md` dan semua rule yang di-import.
+Claude Code will automatically read `CLAUDE.md` and all imported rules.
 
-### Verifikasi Setup Per-Project
+### Verify
 
-Ketik ini di Claude Code:
+Type this in Claude Code:
 
 ```
-Apa saja rules yang aktif saat ini?
+What rules are currently active?
 ```
 
-Claude harus bisa menyebutkan rules dari `.claude/rules/` yang di-import di `CLAUDE.md`.
+Claude should list the rules imported from `.claude/rules/`.
 
 ---
 
-## Opsi 2: Penggunaan Global (Berlaku di Semua Project)
+## Option 2: Global Installation (Applies to All Projects)
 
-Pendekatan ini membuat rules dan commands tersedia di **semua project** di komputermu — tanpa perlu copy ke setiap project.
+Rules and commands become available across **every project** on your machine — no per-project setup needed.
 
-### Struktur Global Claude Code
+### Via npx
+
+```bash
+npx claude-setup --global
+```
+
+The installer handles everything automatically:
+- Copies `rules/`, `skills/`, `commands/` into `~/.claude/`
+- Generates `~/.claude/CLAUDE.md` with correct `@rules/` import paths
+- Updates all path references inside command files for global use
+
+### Structure after global install
 
 ```
 ~/.claude/
-├── CLAUDE.md           ← instruksi global (dibuat manual, lihat di bawah)
-├── commands/           ← commands global
-├── rules/              ← rules global
-└── skills/             ← skills global
+├── CLAUDE.md           ← generated by the installer
+├── commands/           ← 9 slash commands
+├── rules/              ← 42 rule files
+└── skills/             ← skill assets
 ```
 
-### Langkah Setup Global
+### Verify
 
-**1. Salin rules dan skills ke `~/.claude/`**
+Open Claude Code in **any directory** that doesn't have its own `CLAUDE.md`:
 
 ```bash
-# Buat direktori jika belum ada
-mkdir -p ~/.claude/commands
-mkdir -p ~/.claude/rules
-mkdir -p ~/.claude/skills
-
-# Salin semua konten
-cp /path/ke/ANTIGRAVITY/.claude/commands/* ~/.claude/commands/
-cp -r /path/ke/ANTIGRAVITY/.claude/rules/. ~/.claude/rules/
-cp -r /path/ke/ANTIGRAVITY/.claude/skills/. ~/.claude/skills/
+mkdir /tmp/test && cd /tmp/test
+claude
 ```
 
-**2. Buat `~/.claude/CLAUDE.md` dengan path yang disesuaikan**
-
-Untuk setup global, path `@` di `CLAUDE.md` harus relatif terhadap `~/.claude/` (bukan project root). Buat file baru:
-
-```bash
-cat > ~/.claude/CLAUDE.md << 'EOF'
-# Global Engineering Standards
-
-## Aturan yang Selalu Aktif
-
-@rules/rule-priority.md
-@rules/rugged-software-constitution.md
-@rules/security-mandate.md
-@rules/code-completion-mandate.md
-@rules/logging-and-observability-mandate.md
-@rules/concurrency-and-threading-mandate.md
-@rules/core-design-principles.md
-@rules/architectural-pattern.md
-@rules/code-organization-principles.md
-@rules/code-idioms-and-conventions.md
-@rules/documentation-principles.md
-@rules/project-structure.md
-
----
-
-## Aturan Kontekstual (Baca Saat Relevan)
-
-- Error handling → `~/.claude/rules/error-handling-principles.md`
-- Testing → `~/.claude/rules/testing-strategy.md`
-- Security (detail) → `~/.claude/rules/security-principles.md`
-- Database → `~/.claude/rules/database-design-principles.md`
-- API design → `~/.claude/rules/api-design-principles.md`
-- Git workflow → `~/.claude/rules/git-workflow-principles.md`
-- Performance → `~/.claude/rules/performance-optimization-principles.md`
-- Go → `~/.claude/rules/go-idioms-and-patterns.md`
-- TypeScript → `~/.claude/rules/typescript-idioms-and-patterns.md`
-- Vue → `~/.claude/rules/vue-idioms-and-patterns.md`
-- Python → `~/.claude/rules/python-idioms-and-patterns.md`
-- Rust → `~/.claude/rules/rust-idioms-and-patterns.md`
-- Flutter → `~/.claude/rules/flutter-idioms-and-patterns.md`
-EOF
+Type:
+```
+What rules are currently active?
 ```
 
-**3. Update path di dalam command files**
+Claude should list rules from `~/.claude/rules/`.
 
-Command files yang ada saat ini mereferensikan `.claude/rules/` (relatif terhadap project). Untuk global, path tersebut perlu diubah agar Claude bisa menemukan rules yang ada di `~/.claude/rules/`.
-
-Jalankan script berikut:
+### Manual global setup (alternative)
 
 ```bash
-# Ganti .claude/rules/ dan .claude/skills/ menjadi ~/.claude/rules/ dan ~/.claude/skills/
-# di semua global command files
+git clone https://github.com/enggarasmoro/claude-setup.git
+
+mkdir -p ~/.claude/{commands,rules,skills}
+
+cp claude-setup/.claude/commands/* ~/.claude/commands/
+cp -r claude-setup/.claude/rules/. ~/.claude/rules/
+cp -r claude-setup/.claude/skills/. ~/.claude/skills/
+
+# Update path references inside command files
 for f in ~/.claude/commands/*.md; do
   sed -i 's|\.claude/rules/|~/.claude/rules/|g' "$f"
   sed -i 's|\.claude/skills/|~/.claude/skills/|g' "$f"
 done
 ```
 
-> **Catatan:** Setelah langkah ini, global commands akan mereferensikan `~/.claude/rules/` dan `~/.claude/skills/`. Jika kamu juga pakai per-project, biarkan `.claude/` di project apa adanya — keduanya bisa berjalan berdampingan.
-
-**4. Verifikasi setup global**
-
-Buka Claude Code di direktori **manapun** yang tidak punya `CLAUDE.md` sendiri:
-
-```bash
-mkdir /tmp/test-global && cd /tmp/test-global
-claude
-```
-
-Ketik:
-```
-Sebutkan rules apa yang sedang aktif?
-```
-
-Claude harus bisa menyebutkan rules dari `~/.claude/rules/`.
+Then create `~/.claude/CLAUDE.md` — use the file generated by `npx claude-setup --global` as a reference template.
 
 ---
 
-## Opsi 3: Hybrid (Global + Per-Project Override)
+## Option 3: Hybrid (Global Base + Per-Project Override)
 
-Pendekatan terbaik untuk tim atau developer yang punya banyak project dengan stack berbeda.
+Best approach for teams or developers working across many projects with different stacks.
 
 ```
-~/.claude/CLAUDE.md          → rules universal (security, design, logging)
-~/.claude/commands/          → commands global
+~/.claude/CLAUDE.md          → universal rules (security, design, logging)
+~/.claude/commands/          → global commands
 
 my-project/
-├── CLAUDE.md                → override: tambah rules spesifik project (misalnya Go idioms)
+├── CLAUDE.md                → adds project-specific rules on top of global
 └── .claude/
-    ├── rules/               → rules tambahan spesifik project
-    └── commands/            → commands tambahan spesifik project
+    ├── rules/               → project-specific rule files
+    └── commands/            → project-specific commands
 ```
 
-Claude Code menggabungkan kedua CLAUDE.md — global dibaca lebih dulu, project-level menambahkan atau meng-override.
+Claude Code merges both `CLAUDE.md` files — global is read first, project-level adds or overrides on top.
 
-**Contoh `CLAUDE.md` per-project untuk override:**
+**Example project-level `CLAUDE.md` override:**
 
 ```markdown
-# My Go Microservice Project
+# My Go Microservice
 
-## Tambahan Rules untuk Project Ini
+## Project-Specific Rules
 
 @.claude/rules/go-idioms-and-patterns.md
 @.claude/rules/project-structure-go-backend.md
 @.claude/rules/database-design-principles.md
 
-## Catatan Project Spesifik
-- Gunakan PostgreSQL untuk semua storage
-- Service port default: 8080
-- Env vars wajib: DATABASE_URL, PORT, LOG_LEVEL
+## Project Notes
+- Use PostgreSQL for all storage
+- Default service port: 8080
+- Required env vars: DATABASE_URL, PORT, LOG_LEVEL
 ```
 
 ---
 
-## Panduan Slash Commands
+## Slash Commands Reference
 
-Ketik `/` di Claude Code untuk melihat semua command yang tersedia. Berikut daftar lengkap dan cara pakainya:
+Type `/` in Claude Code to see all available commands. Below is the full reference.
 
 ---
 
-### `/orchestrator` — Workflow Fitur Lengkap
+### `/orchestrator` — Full Feature Workflow
 
-Gunakan saat membangun **fitur baru** dari awal. Workflow 5 fase: Research → Implement → Integrate → Verify → Ship.
+Use when building a **new feature from scratch**. Enforces a strict 5-phase workflow: Research → Implement → Integrate → Verify → Ship. Phases cannot be skipped.
 
 ```
 /orchestrator
+Add a POST /api/tasks endpoint that creates a task with title, description,
+and due_date. Persist to PostgreSQL.
 ```
 
-Setelah itu, jelaskan fitur yang ingin dibangun:
+**Claude will:**
+1. Create `task.md` as the progress tracker
+2. Write a research log to `docs/research_logs/`
+3. Follow TDD — write the failing test first, then implement
+4. Run integration tests against real infrastructure (Testcontainers)
+5. Run full lint + test suite before committing
+6. Commit using conventional format: `feat(tasks): add create task endpoint`
 
-```
-/orchestrator
-Saya ingin menambahkan endpoint POST /api/tasks untuk membuat task baru.
-Task harus punya title, description, dan due_date. Simpan ke PostgreSQL.
-```
-
-**Claude akan:**
-1. Membuat `task.md` sebagai tracking
-2. Membuat research log di `docs/research_logs/`
-3. Menulis test dulu (TDD), baru implementasi
-4. Meminta kamu konfirmasi sebelum lanjut ke integration test
-5. Melakukan full lint + test sebelum commit
-6. Commit dengan format conventional (`feat(tasks): add create task endpoint`)
-
-> **Penting:** Command ini melarang keras melewati fase. Jika ada fase yang gagal, Claude berhenti dan tidak lanjut.
+> Phase gates are hard stops. If a phase fails, Claude stops and will not proceed until it is fixed.
 
 ---
 
-### `/quick-fix` — Perbaikan Bug Cepat
+### `/quick-fix` — Fast Bug Fix
 
-Gunakan untuk bug kecil yang **sudah diketahui root cause-nya**, perubahan < 50 baris, atau hotfix.
+Use for bugs with a **known root cause**, isolated changes under 50 lines, or production hotfixes.
 
 ```
 /quick-fix
-Bug: fungsi calculateTotal() mengembalikan NaN jika salah satu item price-nya null.
-File: src/utils/cart.ts baris 47
+calculateTotal() returns NaN when any item has a null price.
+File: src/utils/cart.ts line 47
 ```
 
-**Claude akan:**
-1. Identifikasi kode yang bermasalah
-2. Tulis failing test yang mereproduksi bug
-3. Terapkan fix minimal
-4. Verifikasi semua test tetap lulus
-5. Commit dengan `fix(scope): deskripsi`
+**Claude will:**
+1. Locate the affected code
+2. Write a failing test that reproduces the bug
+3. Apply the minimal fix to make the test pass
+4. Verify all existing tests still pass
+5. Commit with `fix(scope): description`
 
-**Jangan gunakan untuk:**
-- Fitur baru → pakai `/orchestrator`
-- Refactoring besar → pakai `/refactor`
+**Do not use for:**
+- New features → use `/orchestrator`
+- Large restructuring → use `/refactor`
 
 ---
 
-### `/refactor` — Restrukturisasi Kode
+### `/refactor` — Safe Code Restructuring
 
-Gunakan untuk restrukturisasi kode sambil mempertahankan perilaku yang sama. **Harus punya tujuan spesifik.**
-
-```
-/refactor extract storage interface dari user feature agar bisa di-mock di test
-```
+Use to restructure code while preserving behaviour. **Requires a specific, scoped goal.**
 
 ```
-/refactor pisah handler authentication dari user handler yang ada di handlers/user.go
+/refactor extract a storage interface from the user feature so it can be mocked in tests
 ```
 
-**Claude akan:**
-1. Analisis blast radius (file apa saja yang terpengaruh)
-2. Buat rencana inkremental di `task.md`
-3. Ubah satu langkah sekaligus, test setelah setiap langkah
-4. Verifikasi coverage tidak turun
-5. Commit dengan `refactor(scope): deskripsi`
-
-**Jangan gunakan:**
 ```
-/refactor apps/backend    ← terlalu samar, gunakan /audit dulu
+/refactor split authentication logic out of handlers/user.go into its own handler
+```
+
+**Claude will:**
+1. Map the blast radius — which files, modules, and tests are affected
+2. Build an incremental plan in `task.md`
+3. Make one change at a time, run tests after each step
+4. Verify coverage is equal to or better than before
+5. Commit with `refactor(scope): description`
+
+**Avoid vague targets:**
+```
+/refactor apps/backend    ← too broad — run /audit first to identify specific issues
 ```
 
 ---
 
-### `/audit` — Review Kualitas Kode
+### `/audit` — Code Quality Inspection
 
-Gunakan untuk **inspeksi kualitas** kode yang sudah ada. Tidak menulis kode baru — hanya menemukan isu.
+Use to **inspect existing code quality** and produce a structured findings report. Does not write new code.
 
 ```
 /audit src/features/payment
@@ -333,64 +301,67 @@ Gunakan untuk **inspeksi kualitas** kode yang sudah ada. Tidak menulis kode baru
 /audit handlers/user.go handlers/order.go
 ```
 
-**Claude akan:**
-1. Review berdasarkan prioritas: Security → Reliability → Testability → Observability → Code Quality
-2. Analisis cross-boundary (integrasi frontend-backend, schema DB, env vars, dependency health)
-3. Jalankan lint dan test suite
-4. Simpan laporan ke `docs/audits/review-findings-{feature}-{tanggal}.md`
+**Claude will:**
+1. Review by priority: Security → Reliability → Testability → Observability → Code Quality
+2. Run cross-boundary checks (frontend–backend contracts, DB schema, env config, dependency health)
+3. Execute the full lint and test suite
+4. Save the report to `docs/audits/review-findings-{feature}-{date}.md`
 
-**Output laporan mencakup:**
-- Critical Issues (harus diperbaiki sebelum deploy)
-- Major Issues (sebaiknya diperbaiki segera)
-- Minor Issues (style/naming)
-- Hasil lint, test, coverage
+**Report includes:**
+- Critical Issues (must fix before deploy)
+- Major Issues (fix soon)
+- Minor Issues (style, naming)
+- Lint, test, and coverage results
 
-**Setelah audit**, pilih workflow yang sesuai:
-- Nit/minor → perbaiki langsung
-- Fix kecil → `/quick-fix`
-- Struktural → `/refactor`
-- Fitur hilang → `/orchestrator`
+**After the audit**, route each finding to the right workflow:
+
+| Finding type | Example | Workflow |
+|---|---|---|
+| Nit / minor | "Rename `x` to `userCount`" | Fix inline |
+| Small isolated fix | "Add input validation on handler" | `/quick-fix` |
+| Structural change | "Storage not behind an interface" | `/refactor` |
+| Missing capability | "No auth middleware on admin routes" | `/orchestrator` |
 
 ---
 
-### `/perf-optimize` — Optimasi Performa
+### `/perf-optimize` — Profile-Driven Performance
 
-Gunakan saat punya **data profiling** atau benchmark yang menunjukkan regresi.
+Use when you have **profiling data** or benchmarks showing a regression.
 
 ```
 /perf-optimize
-Benchmark menunjukkan endpoint /api/search memakan 800ms untuk 100 item.
-Berikut output pprof: [paste output atau path ke file]
+The /api/search endpoint takes 800ms for 100 items.
+Here is the pprof output: [paste output or file path]
 ```
 
-**Claude akan:**
-1. Baca skill dan panduan bahasa yang relevan dari `.claude/skills/perf-optimization/`
-2. Buat analisis di `docs/research_logs/{component}-perf-analysis.md`
-3. Identifikasi top 3-5 bottleneck
-4. **Tunjukkan rencana dan minta persetujuan kamu** sebelum mulai
-5. Implementasi satu fix per commit dengan benchmark before/after
-6. Commit dengan `perf(scope): deskripsi`
+**Claude will:**
+1. Read the relevant skill and language module from `.claude/skills/perf-optimization/`
+2. Produce an analysis document at `docs/research_logs/{component}-perf-analysis.md`
+3. Identify the top 3–5 bottlenecks
+4. **Present the fix plan and wait for your approval** before touching any code
+5. Implement one fix per commit with before/after benchmark comparison
+6. Commit with `perf(scope): description`
 
 ---
 
 ### `/adr` — Architecture Decision Record
 
-Gunakan saat memilih antara 2+ pendekatan arsitektur yang berbeda, atau memperkenalkan dependency baru.
+Use when choosing between two or more architectural approaches, or when introducing a new dependency or pattern.
 
 ```
-/adr pilih antara Redis vs in-memory cache untuk session storage
+/adr choose between Redis and in-memory cache for session storage
 ```
 
 ```
-/adr adopsi Testcontainers untuk integration testing
+/adr adopt Testcontainers for integration testing
 ```
 
-**Claude akan:**
-1. Cek nomor ADR terakhir di `docs/decisions/`
-2. Buat file `docs/decisions/NNNN-judul.md`
-3. Isi dengan: Context, Options Considered (pros/cons/effort), Decision, Consequences
+**Claude will:**
+1. Check the latest ADR number in `docs/decisions/`
+2. Create `docs/decisions/NNNN-title.md`
+3. Fill it with: Context, Options Considered (pros / cons / effort), Decision, Consequences
 
-**Format file yang dibuat:**
+**Example output structure:**
 ```
 docs/decisions/
 ├── 0001-use-postgresql-for-storage.md
@@ -400,31 +371,31 @@ docs/decisions/
 
 ---
 
-### `/debug` — Protokol Debugging Sistematis
+### `/debug` — Systematic Debugging Protocol
 
-Gunakan saat ada bug kompleks, test yang flaky, atau perilaku sistem yang tidak dimengerti.
-
-```
-/debug endpoint POST /api/order kadang mengembalikan 500 tapi tidak ada log error yang jelas
-```
+Use for complex bugs, flaky tests, or unexplained system behaviour.
 
 ```
-/debug TestUserLogin_Success flaky di CI tapi selalu pass di local
+/debug POST /api/order occasionally returns 500 with no visible error log
 ```
 
-**Claude akan:**
-1. Buat dokumen sesi di `docs/debugging/{issue}-{tanggal}.md`
-2. Formulasikan minimal 2-3 hipotesis yang berbeda
-3. Desain validation task untuk setiap hipotesis (query spesifik, command, kode debug)
-4. Eksekusi dan dokumentasikan hasil
-5. Konfirmasi root cause sebelum menyatakan selesai
-6. Serahkan ke `/quick-fix` atau `/orchestrator` untuk perbaikan
+```
+/debug TestUserLogin_Success is flaky in CI but always passes locally
+```
+
+**Claude will:**
+1. Create a session document at `docs/debugging/{issue}-{date}.md`
+2. Formulate at least 2–3 distinct, testable hypotheses
+3. Design a validation task for each hypothesis (specific query, command, or debug snippet)
+4. Execute, record results, and mark each hypothesis confirmed / refuted / inconclusive
+5. Confirm the root cause before declaring it resolved
+6. Hand off to `/quick-fix` or `/orchestrator` for the actual fix
 
 ---
 
-### `/code-review` — Review Kode dengan Checklist
+### `/code-review` — Structured Code Review
 
-Gunakan untuk review kode spesifik dengan output berformat rapi. Berbeda dengan `/audit` yang lebih komprehensif, ini fokus pada file/perubahan tertentu.
+Use for reviewing specific files or changes with a clean, categorised findings output. More focused than `/audit`, which covers the whole codebase.
 
 ```
 /code-review handlers/payment.go
@@ -434,113 +405,115 @@ Gunakan untuk review kode spesifik dengan output berformat rapi. Berbeda dengan 
 /code-review src/features/auth/
 ```
 
-**Output menggunakan severity tags:**
-- `[SEC]` — Security issue
-- `[DATA]` — Data integrity / loss risk
-- `[RES]` — Resource leak
-- `[TEST]` — Testability issue
-- `[OBS]` — Observability / logging missing
-- `[ERR]` — Error handling
-- `[ARCH]` — Architecture violation
-- `[PAT]` — Pattern inconsistency
+**Output uses severity tags:**
 
-**Contoh output:**
+| Tag | Category |
+|-----|----------|
+| `[SEC]` | Security vulnerability |
+| `[DATA]` | Data integrity / loss risk |
+| `[RES]` | Resource leak |
+| `[TEST]` | Testability issue |
+| `[OBS]` | Missing observability / logging |
+| `[ERR]` | Error handling gap |
+| `[ARCH]` | Architecture violation |
+| `[PAT]` | Pattern inconsistency |
+
+**Example output:**
 ```markdown
 ## Critical Issues
-- [ ] [SEC] Input `userId` tidak divalidasi sebelum digunakan di query — handlers/payment.go:34
+- [ ] [SEC] `userId` is used in a query without validation — handlers/payment.go:34
 
 ## Major Issues
-- [ ] [TEST] PaymentService bergantung langsung pada DB, tidak bisa di-mock — handlers/payment.go:12
-- [ ] [OBS] Tidak ada logging saat payment gagal — handlers/payment.go:67
+- [ ] [TEST] PaymentService depends directly on DB, cannot be mocked — handlers/payment.go:12
+- [ ] [OBS] No log entry when payment fails — handlers/payment.go:67
 ```
 
 ---
 
-### `/sequential-thinking` — Analisis Iteratif Masalah Kompleks
+### `/sequential-thinking` — Iterative Analysis for Complex Problems
 
-Gunakan untuk perencanaan atau analisis yang membutuhkan pemikiran bertahap dengan kemungkinan koreksi arah.
-
-```
-/sequential-thinking
-Bagaimana cara terbaik memigrasikan auth dari JWT stateless ke session-based
-tanpa downtime dan tanpa logout user yang sudah login?
-```
+Use for planning or design work that requires step-by-step reasoning with the ability to revise earlier conclusions.
 
 ```
 /sequential-thinking
-Desain sistem notifikasi real-time untuk 100k concurrent users
-dengan budget infrastruktur minimal
+What is the safest way to migrate auth from stateless JWT to session-based
+without downtime and without logging out existing users?
 ```
 
-**Claude akan:**
-1. Estimasi jumlah langkah pemikiran yang diperlukan
-2. Berpikir step-by-step, setiap langkah membangun di atas yang sebelumnya
-3. Merevisi pemikiran sebelumnya jika menemukan kesalahan
-4. Menjelajahi alternatif saat diperlukan
-5. Memberikan satu jawaban final yang jelas
+```
+/sequential-thinking
+Design a real-time notification system for 100k concurrent users
+with minimal infrastructure budget
+```
+
+**Claude will:**
+1. Estimate the number of reasoning steps needed
+2. Think step-by-step, each thought building on the last
+3. Revise earlier conclusions if a better understanding emerges
+4. Explore alternative approaches when needed
+5. Deliver a single, clear final answer
 
 ---
 
-## Cara Rules Bekerja dalam Practice
+## How the Rules Work in Practice
 
-### Rules yang Selalu Aktif (tidak perlu dipanggil)
+### Always-on rules (loaded automatically)
 
-Setiap kali kamu membuka Claude Code di project ini, 12 rules berikut otomatis aktif:
+Every time you open Claude Code in a project with this setup, these 12 rules are active:
 
-| Rule | Apa yang Dijaga |
-|------|-----------------|
-| `rule-priority.md` | Cara resolve konflik antar rules |
-| `rugged-software-constitution.md` | Filosofi dasar: kode defensif |
-| `security-mandate.md` | Security tidak bisa dikompromikan |
-| `code-completion-mandate.md` | Kode harus lengkap, tidak setengah jadi |
-| `logging-and-observability-mandate.md` | Silent failure adalah musuh |
-| `concurrency-and-threading-mandate.md` | Race condition harus dicegah |
+| Rule file | What it enforces |
+|-----------|-----------------|
+| `rule-priority.md` | How to resolve conflicts between rules |
+| `rugged-software-constitution.md` | Core philosophy: code must be defensible |
+| `security-mandate.md` | Security is non-negotiable |
+| `code-completion-mandate.md` | No half-finished implementations |
+| `logging-and-observability-mandate.md` | Silent failures are the enemy |
+| `concurrency-and-threading-mandate.md` | Race conditions must be prevented |
 | `core-design-principles.md` | SOLID, DRY, YAGNI, KISS |
 | `architectural-pattern.md` | Testability-first, dependency injection |
-| `code-organization-principles.md` | Struktur file dan modul |
-| `code-idioms-and-conventions.md` | Konvensi kode yang konsisten |
-| `documentation-principles.md` | Kapan dan bagaimana mendokumentasikan |
-| `project-structure.md` | Struktur direktori standar |
+| `code-organization-principles.md` | File and module structure |
+| `code-idioms-and-conventions.md` | Consistent code conventions |
+| `documentation-principles.md` | When and how to document |
+| `project-structure.md` | Standard directory layout |
 
-### Contoh Efeknya
+### What this looks like in practice
 
-Kamu tidak perlu bilang "jangan hardcode secrets" atau "tambahkan error handling" — Claude sudah tahu karena rules sudah aktif. Misalnya:
+You do not need to say "don't hardcode secrets" or "add error handling" — Claude already knows because the rules are loaded. For example:
 
 ```
-Buat fungsi untuk connect ke database PostgreSQL
+Write a function to connect to PostgreSQL
 ```
 
-Claude otomatis akan:
-- Membaca connection string dari environment variable (bukan hardcode)
-- Menambahkan error handling
-- Menambahkan logging saat connect berhasil/gagal
-- Mengembalikan error yang bisa dihandle oleh caller
-- Menggunakan context dengan timeout
+Claude will automatically:
+- Read the connection string from an environment variable (never hardcode)
+- Return an error the caller can handle
+- Add logging on both successful and failed connections
+- Use a context with a timeout
 
-### Menambah Rules Sendiri
+### Adding your own rules
 
-Buat file `.md` baru di `.claude/rules/` dan import di `CLAUDE.md`:
+Create a new `.md` file in `.claude/rules/` and import it in `CLAUDE.md`:
 
 ```markdown
 <!-- .claude/rules/my-project-rules.md -->
-## Aturan Spesifik Project Ini
+## Project-Specific Rules
 
-- Semua response API harus menggunakan struct `APIResponse{Data, Error, Meta}`
-- Jangan gunakan `time.Now()` langsung di production code, selalu inject `Clock` interface
+- All API responses must use the shape: `{ data, error, meta }`
+- Never call `time.Now()` directly in production code — inject a `Clock` interface
 ```
 
 ```markdown
-<!-- CLAUDE.md — tambahkan baris ini -->
+<!-- CLAUDE.md — add this line -->
 @.claude/rules/my-project-rules.md
 ```
 
 ---
 
-## Struktur File Referensi
+## File Structure Reference
 
 ```
 project/
-├── CLAUDE.md                          ← Entry point, auto-loaded
+├── CLAUDE.md                          ← Entry point, auto-loaded by Claude Code
 │
 ├── .claude/
 │   ├── commands/                      ← Slash commands
@@ -555,10 +528,10 @@ project/
 │   │   └── sequential-thinking.md     → /sequential-thinking
 │   │
 │   ├── rules/                         ← 42 rule files
-│   │   ├── [12 always-on rules]       ← Di-import CLAUDE.md
-│   │   └── [30 contextual rules]      ← Dibaca commands saat relevan
+│   │   ├── [12 always-on rules]       ← imported by CLAUDE.md
+│   │   └── [30 contextual rules]      ← read by commands when relevant
 │   │
-│   └── skills/                        ← Aset pendukung commands
+│   └── skills/                        ← Supporting assets for commands
 │       ├── adr/
 │       ├── code-review/languages/
 │       ├── debugging-protocol/
@@ -568,42 +541,42 @@ project/
 │       ├── perf-optimization/
 │       └── sequential-thinking/
 │
-├── docs/                              ← Dibuat oleh commands saat diperlukan
-│   ├── research_logs/                 ← Output /orchestrator fase 1
-│   ├── decisions/                     ← Output /adr
-│   ├── audits/                        ← Output /audit dan /code-review
-│   └── debugging/                     ← Output /debug
+├── docs/                              ← Created by commands when needed
+│   ├── research_logs/                 ← /orchestrator phase 1 output
+│   ├── decisions/                     ← /adr output
+│   ├── audits/                        ← /audit and /code-review output
+│   └── debugging/                     ← /debug output
 │
-└── task.md                            ← Tracking progress /orchestrator
+└── task.md                            ← /orchestrator progress tracker
 ```
 
 ---
 
 ## FAQ
 
-**Q: Apakah bisa dipakai di VS Code / IDE extension?**  
-A: Ya. Claude Code extension untuk VS Code dan JetBrains membaca `CLAUDE.md` dan `.claude/commands/` yang sama.
+**Q: Does this work in the VS Code / JetBrains extension?**  
+A: Yes. The Claude Code IDE extensions read the same `CLAUDE.md` and `.claude/commands/` files.
 
-**Q: Apakah commands bisa menerima argumen?**  
-A: Ya. Commands yang punya `$ARGUMENTS` di dalamnya akan menerima teks setelah nama command. Contoh: `/audit src/handlers` — "src/handlers" menjadi `$ARGUMENTS`.
+**Q: Can commands accept arguments?**  
+A: Yes. Commands that contain `$ARGUMENTS` receive the text typed after the command name. Example: `/audit src/handlers` — `"src/handlers"` becomes `$ARGUMENTS`.
 
-**Q: Bagaimana jika project saya tidak pakai semua stack (Go, Vue, Python, dll)?**  
-A: Kamu bisa hapus atau abaikan rules yang tidak relevan. Rules kontekstual hanya aktif saat command memanggilnya, jadi tidak ada overhead jika tidak dipakai. Untuk rules always-on di `CLAUDE.md`, kamu bisa hapus import yang tidak relevan.
+**Q: My project only uses one language — do I need all 42 rule files?**  
+A: Contextual rules are only read when a command explicitly references them, so unused rules have zero overhead. For always-on rules in `CLAUDE.md`, you can remove the `@` imports for stacks you don't use.
 
-**Q: Apakah aman di-commit ke repository?**  
-A: Ya dan disarankan. `CLAUDE.md` dan `.claude/` di-commit ke repo agar seluruh tim punya standar yang sama. Tidak ada informasi sensitif di dalamnya.
+**Q: Is it safe to commit `.claude/` to the repository?**  
+A: Yes, and it is recommended. Committing `CLAUDE.md` and `.claude/` ensures every team member gets the same standards automatically. There is no sensitive information in these files.
 
-**Q: Bagaimana cara update rules di masa depan?**  
-A: Edit langsung file `.md` di `.claude/rules/`. Perubahan langsung aktif di sesi Claude Code berikutnya.
+**Q: How do I update the rules later?**  
+A: Edit the `.md` files in `.claude/rules/` directly. Changes take effect in the next Claude Code session.
 
-**Q: Bisa pakai global dan per-project sekaligus?**  
-A: Ya (lihat Opsi 3: Hybrid). Claude Code membaca keduanya dan menggabungkannya, dengan project-level menambahkan atau meng-override global.
+**Q: Can I use global and per-project at the same time?**  
+A: Yes — see Option 3 (Hybrid). Claude Code merges both `CLAUDE.md` files; the project-level one adds to or overrides the global one.
 
-**Q: Commands tampil di `/help` tapi tidak berjalan dengan benar?**  
-A: Pastikan file command punya frontmatter `description:` yang valid. Contoh:
+**Q: A command shows up in `/help` but doesn't behave correctly?**  
+A: Make sure the command file has a valid `description:` frontmatter field:
 ```markdown
 ---
-description: Deskripsi command kamu di sini
+description: What this command does
 ---
 ```
-Tanpa frontmatter yang valid, command mungkin tidak terdaftar dengan benar.
+Without it, the command may not register correctly.
