@@ -6,18 +6,20 @@ A Claude Code configuration kit that brings structured engineering standards to 
 
 ## Quick Install
 
+> **Important:** The package name on npm is `@enggar_asmoro/claude-setup`. There is an unrelated package called `claude-setup` on npm — always use the full scoped name below.
+
 ```bash
 # Install into the current directory
-npx claude-setup
+npx @enggar_asmoro/claude-setup
 
 # Install into a specific project
-npx claude-setup ./my-project
+npx @enggar_asmoro/claude-setup ./my-project
 
 # Overwrite an existing installation without prompting
-npx claude-setup --force
+npx @enggar_asmoro/claude-setup --force
 
 # Install globally (applies to all projects on your machine)
-npx claude-setup --global
+npx @enggar_asmoro/claude-setup --global
 ```
 
 ---
@@ -67,10 +69,10 @@ Isolated configuration per project — ideal when each project has different sta
 
 ```bash
 cd my-project
-npx claude-setup
+npx @enggar_asmoro/claude-setup
 
 # If .claude/ already exists and you want to overwrite
-npx claude-setup --force
+npx @enggar_asmoro/claude-setup --force
 ```
 
 ### Manual (clone from source)
@@ -120,7 +122,7 @@ Rules and commands become available across **every project** on your machine —
 ### Via npx
 
 ```bash
-npx claude-setup --global
+npx @enggar_asmoro/claude-setup --global
 ```
 
 The installer handles everything automatically:
@@ -553,6 +555,9 @@ project/
 ---
 
 ## FAQ
+
+**Q: I ran `npx claude-setup` and got a completely different result (folders like `agents/`, `hooks/`, `snapshots/`)?**  
+A: You ran someone else's package. There is an unrelated package called `claude-setup` on npm. Always use the full scoped name: `npx @enggar_asmoro/claude-setup`. To clean up the wrong install, delete those folders manually and re-run with the correct command.
 
 **Q: Does this work in the VS Code / JetBrains extension?**  
 A: Yes. The Claude Code IDE extensions read the same `CLAUDE.md` and `.claude/commands/` files.
