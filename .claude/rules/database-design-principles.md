@@ -60,6 +60,6 @@
 - [ ] N+1 queries avoided?
 
 ### Related Principles
-- Security Principles @security-principles.md (SQL injection prevention)
-- Performance Optimization Principles @performance-optimization-principles.md (query performance)
-- Error Handling Principles @error-handling-principles.md (transaction error handling)
+- Security Principles security-principles.md (SQL injection prevention)
+- Performance Optimization Principles performance-optimization-principles.md (query performance)
+- Error Handling Principles error-handling-principles.md (transaction error handling)

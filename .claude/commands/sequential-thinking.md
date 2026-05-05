@@ -4,91 +4,72 @@ description: Iterative analysis for complex problems — step-by-step reasoning 
 
 # Sequential Thinking
 
-Problem to analyse: **$ARGUMENTS**
+Problem: **$ARGUMENTS**
 
 ## When to Use
-- Breaking down complex problems into manageable steps
-- Planning and design that requires iterative refinement
-- Analysis that might need course correction mid-stream
-- Problems where the full scope emerges during analysis
-- Multi-step solutions that require context across steps
-- Hypothesis generation and verification
+Complex breakdown, iterative design, mid-stream course correction, emerging scope, multi-step solutions, hypothesis generation/verification.
 
 ---
 
 ## Methodology
 
-Sequential thinking follows a dynamic process:
-
-1. **Initial estimate** — start with an estimate of how many thoughts are needed, but stay flexible
-2. **Iterative analysis** — work through thoughts sequentially while building context
-3. **Revision capability** — question or revise previous thoughts as understanding deepens
-4. **Branch exploration** — explore alternative approaches when needed
-5. **Hypothesis cycle** — generate hypotheses, verify against the thought chain, repeat
-6. **Convergence** — continue until reaching a satisfactory solution
+1. **Initial estimate** of thought count (stay flexible).
+2. **Iterative analysis** — sequential thoughts, building context.
+3. **Revision** — question/revise prior thoughts as understanding deepens.
+4. **Branch exploration** for alternatives.
+5. **Hypothesis cycle** — generate, verify against chain, repeat.
+6. **Convergence** — until satisfactory solution.
 
 ---
 
 ## Instructions
 
-### Starting Out
-- Estimate the initial number of thoughts based on problem complexity
-- Begin with thought 1, establishing context and approach
-- Set `totalThoughts` conservatively — you can adjust as the problem's scope becomes clearer
+### Starting
+- Estimate thoughts from complexity. Set `totalThoughts` conservatively; adjust later.
+- Thought 1 establishes context + approach.
 
-### During Analysis
-- Build on previous thoughts while maintaining context
-- Filter out irrelevant information at each step
-- Express uncertainty when present
-- Revise freely if you spot errors or find a better approach
+### During
+- Build on prior thoughts; filter irrelevant info; express uncertainty; revise on errors.
 
 ### Revision Pattern
-When reconsidering a previous thought:
 ```
 Thought [N/Total]: On reflection, thought 3's assumption about X was incorrect because Y...
 [Revises thought 3]
 ```
 
 ### Branching Pattern
-When exploring an alternative:
 ```
 Thought [N/Total]: Branching from thought X to explore an alternative approach...
 [branchFromThought: X]
 ```
 
 ### Hypothesis Cycle
-1. Generate a hypothesis based on current understanding
-2. Verify it against the previous thought chain
-3. If verification fails → revise or branch
-4. Repeat until the hypothesis is validated
+Generate → verify against chain → if fails, revise/branch → repeat until validated.
 
 ### Completion
-- Only conclude when you are genuinely satisfied with the solution
-- Provide a single, clear final answer
-- Ensure the answer directly addresses the original problem
+Conclude only when satisfied. Single, clear final answer addressing the original problem.
 
 ---
 
 ## Output Format
 
 ```
-Thought [N/Total]: {current thinking step}
-[If revision: "This revises thought X because..."]
+Thought [N/Total]: {step}
+[If revision: "Revises thought X because..."]
 [If branching: "Branching from thought X to explore..."]
 
-[Continue with next thought]
+[Continue]
 
-Solution: {clear, direct answer to the original problem}
+Solution: {clear answer}
 ```
 
 ---
 
 ## Key Principles
+- Flexibility over rigidity
+- Revision is strength
+- Hypothesis-driven
+- Context-aware
+- Clarity at completion
 
-- **Flexibility over rigidity** — adjust your approach as understanding deepens
-- **Revision is strength** — correcting course shows good reasoning
-- **Hypothesis-driven** — generate and test hypotheses iteratively
-- **Context-aware** — maintain awareness of previous thoughts while progressing
-- **Clarity at completion** — deliver a single, clear final answer
-
-For concrete examples, see `.claude/skills/sequential-thinking/resources/examples.md`.
+Examples: `.claude/skills/sequential-thinking/resources/examples.md`.

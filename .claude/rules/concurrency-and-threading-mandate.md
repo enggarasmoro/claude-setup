@@ -8,7 +8,7 @@
 
 **Don't Over-Use Concurrency:** Concurrency adds significant complexity (race conditions, deadlocks, debugging difficulty). Profile first — only add concurrency when there is a measurable performance benefit.
 
-For implementation details (race condition prevention, deadlock avoidance, message passing patterns), see Concurrency and Threading Principles @concurrency-and-threading-principles.md.
+For implementation details (race condition prevention, deadlock avoidance, message passing patterns), see Concurrency and Threading Principles concurrency-and-threading-principles.md.
 
 ### When NOT to Use Concurrency
 - Simple synchronous operations
@@ -16,6 +16,6 @@ For implementation details (race condition prevention, deadlock avoidance, messa
 - Avoid premature optimization
 
 ### Related Principles
-- Concurrency and Threading Principles @concurrency-and-threading-principles.md
-- Performance Optimization Principles @performance-optimization-principles.md
-- Rust Idioms and Patterns @rust-idioms-and-patterns.md
+- Concurrency and Threading Principles concurrency-and-threading-principles.md
+- Performance Optimization Principles performance-optimization-principles.md
+- Rust Idioms and Patterns rust-idioms-and-patterns.md

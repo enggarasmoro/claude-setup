@@ -81,6 +81,6 @@ We chose **Option X** because...
 
 ## Rule Compliance
 ADRs should reference applicable rules:
-- Architectural Patterns @architectural-pattern.md
-- Core Design Principles @core-design-principles.md
-- Project Structure @project-structure.md
+- Architectural Patterns architectural-pattern.md
+- Core Design Principles core-design-principles.md
+- Project Structure project-structure.md

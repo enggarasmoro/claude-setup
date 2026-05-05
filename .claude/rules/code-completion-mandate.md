@@ -4,7 +4,7 @@
 
 **Before marking any code task as complete, you MUST run automated quality checks and remediate all issues.**
 
-This is NOT OPTIONAL. Delivering code without validation violates the Rugged Software Constitution @rugged-software-constitution.md.
+This is NOT OPTIONAL. Delivering code without validation violates the Rugged Software Constitution rugged-software-constitution.md.
 
 ### The Completion Checklist
 
@@ -24,11 +24,11 @@ The authoritative commands for each language live in the corresponding idiom fil
 
 | Language             | Idiom File                         | Commands Section                 |
 | -------------------- | ---------------------------------- | -------------------------------- |
-| **Go**               | @go-idioms-and-patterns.md         | § Formatting and Static Analysis |
-| **TypeScript / Vue** | @typescript-idioms-and-patterns.md | § Formatting and Static Analysis |
-| **Vue 3**            | @vue-idioms-and-patterns.md        | § Linting and Type Checking      |
-| **Flutter / Dart**   | @flutter-idioms-and-patterns.md    | § Linting and Formatting         |
-| **Rust**             | @rust-idioms-and-patterns.md       | § Clippy and Formatting          |
+| **Go**               | go-idioms-and-patterns.md         | § Formatting and Static Analysis |
+| **TypeScript / Vue** | typescript-idioms-and-patterns.md | § Formatting and Static Analysis |
+| **Vue 3**            | vue-idioms-and-patterns.md        | § Linting and Type Checking      |
+| **Flutter / Dart**   | flutter-idioms-and-patterns.md    | § Linting and Formatting         |
+| **Rust**             | rust-idioms-and-patterns.md       | § Clippy and Formatting          |
 
 ### Failure Protocol
 
@@ -42,5 +42,5 @@ The authoritative commands for each language live in the corresponding idiom fil
 > Never disable a lint rule or suppress a warning to make checks pass. Fix the root cause.
 
 ### Related Principles
-- Rugged Software Constitution @rugged-software-constitution.md
-- Code Idioms and Conventions @code-idioms-and-conventions.md
+- Rugged Software Constitution rugged-software-constitution.md
+- Code Idioms and Conventions code-idioms-and-conventions.md

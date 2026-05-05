@@ -80,6 +80,6 @@ After completing the universal checklist above, load the relevant language-speci
 ## Rule Compliance
 This skill enforces:
 - All mandates (always-on rules)
-- Architectural Patterns @architectural-pattern.md
-- Testing Strategy @testing-strategy.md
-- Rule Priority @rule-priority.md
+- Architectural Patterns architectural-pattern.md
+- Testing Strategy testing-strategy.md
+- Rule Priority rule-priority.md

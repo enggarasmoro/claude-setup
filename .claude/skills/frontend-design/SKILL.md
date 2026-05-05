@@ -1,6 +1,6 @@
 # Frontend Design Skill
 
-This skill guides creation of **distinctive, production-grade frontend interfaces** that avoid generic "AI slop" aesthetics. Follow the phased workflow below. Each phase has concrete reference material — use it, don't invent from scratch.
+Guides creation of **distinctive, production-grade frontend interfaces** that avoid generic "AI slop". Follow the phased workflow — each phase has concrete reference material.
 
 ---
 
@@ -8,34 +8,29 @@ This skill guides creation of **distinctive, production-grade frontend interface
 
 ### Phase 1: Design Direction
 
-Before touching any code, commit to a clear aesthetic direction. Answer these:
-
 **Context questions:**
 - What problem does this interface solve? Who uses it?
 - What's the one thing someone will remember about this design?
 - What aesthetic direction fits? (Choose ONE — don't blend randomly)
 
-**Aesthetic directions to pick from:**
-Brutally minimal · Maximalist chaos · Retro-futuristic · Organic/natural · Luxury/refined · Playful/toy-like · Editorial/magazine · Brutalist/raw · Art deco/geometric · Soft/pastel · Industrial/utilitarian · Sci-fi/cyberpunk
+**Aesthetic directions (pick one):** Brutally minimal · Maximalist chaos · Retro-futuristic · Organic/natural · Luxury/refined · Playful/toy-like · Editorial/magazine · Brutalist/raw · Art deco/geometric · Soft/pastel · Industrial/utilitarian · Sci-fi/cyberpunk
 
-**CRITICAL:** Every generation must make a fresh choice. Never default to the same direction twice. Vary light/dark themes, fonts, and palettes across generations.
+**CRITICAL:** Every generation makes a fresh choice. Never default twice. Vary themes/fonts/palettes.
 
-**Deliverables from Phase 1:**
+**Deliverables:**
 - ✓ Named aesthetic direction (e.g., "editorial luxury, dark theme")
-- ✓ Font pairing selected from `references/typography.md`
-- ✓ Color palette selected from `references/color-palettes.md`
-- ✓ Layout composition(s) selected from `references/layout-compositions.md`
+- ✓ Font pairing from `references/typography.md`
+- ✓ Color palette from `references/color-palettes.md`
+- ✓ Layout composition(s) from `references/layout-compositions.md`
 
 ---
 
 ### Phase 2: Token System
 
-Set up the design token foundation before writing any component code.
-
-1. Copy `examples/design-tokens.css` into the project
-2. Override the palette primitives with your chosen palette's HSL values
-3. Override `--font-display` and `--font-body` with your chosen font pairing
-4. Add the Google Fonts `@import` to your HTML `<head>` (with preconnect hints)
+1. Copy `examples/design-tokens.css` into project
+2. Override palette primitives with chosen palette HSL values
+3. Override `--font-display` and `--font-body` with chosen fonts
+4. Add Google Fonts `@import` to `<head>` (with preconnect hints)
 
 ```html
 <!-- Always preconnect BEFORE the font stylesheet -->
@@ -44,18 +39,14 @@ Set up the design token foundation before writing any component code.
 <link rel="stylesheet" href="[your @import from typography.md]">
 ```
 
-**Deliverables from Phase 2:**
-- ✓ `design-tokens.css` (or equivalent) in place with chosen palette/fonts
-- ✓ All colors, spacing, typography, shadows, and motion defined as CSS variables
-- ✓ No hardcoded color values or magic numbers anywhere in component code
+**Deliverables:**
+- ✓ `design-tokens.css` in place with chosen palette/fonts
+- ✓ All colors, spacing, typography, shadows, motion as CSS variables
+- ✓ No hardcoded color values or magic numbers in component code
 
 ---
 
 ### Phase 3: Build
-
-Load the framework module for your target and implement components using design tokens.
-
-**Framework modules — load the relevant one:**
 
 | Target | Module |
 |---|---|
@@ -63,91 +54,80 @@ Load the framework module for your target and implement components using design 
 | HTML + Vanilla CSS/JS | `frameworks/html-css.md` |
 
 **Build principles:**
-- Implement components from the layout compositions you chose
-- Apply motion patterns from `references/motion-patterns.md` at high-impact moments: page load, scroll reveals, hover states
+- Implement components from chosen layout compositions
+- Apply motion from `references/motion-patterns.md` at high-impact moments: page load, scroll reveals, hover
 - Use only `transform` and `opacity` for animations — never `width`, `height`, `top`, `left`
-- Every interactive element needs a hover state AND a focus-visible state
-- Stagger entrance animations for groups of elements (cards, list items)
+- Every interactive element needs hover AND focus-visible states
+- Stagger entrance animations for groups (cards, lists)
 
 **Mobile responsive (load `references/mobile-responsive.md`):**
-- Write CSS mobile-first: base styles for phone, `min-width` queries for larger screens
-- Every tap target: ≥ 44×44px (`min-height: 44px; min-width: 44px`)
-- Use `100svh` not `100vh` for full-screen sections (iOS Safari compatibility)
+- Mobile-first CSS: base styles for phone, `min-width` queries for larger
+- Tap targets ≥ 44×44px (`min-height: 44px; min-width: 44px`)
+- Use `100svh` not `100vh` (iOS Safari)
 - Add `env(safe-area-inset-*)` padding on fixed bottom elements
-- Test at 375px, 768px, and 1280px minimum — use the decision matrix in the module
+- Test at 375px, 768px, 1280px minimum
 
 **PWA readiness (load `references/pwa-checklist.md` for production apps):**
-- Add `manifest.json` with correct `name`, `icons` (192 + 512 + maskable), `theme_color`
-- Add PWA meta tags to `<head>` (theme-color, apple-mobile-web-app-capable, apple-touch-icon)
-- Register a service worker with appropriate caching strategy
-- Create an offline fallback page (`offline.html`)
-- For Vite projects: prefer `vite-plugin-pwa` over manual SW
+- `manifest.json` with `name`, `icons` (192 + 512 + maskable), `theme_color`
+- PWA meta tags in `<head>` (theme-color, apple-mobile-web-app-capable, apple-touch-icon)
+- Service worker with appropriate caching strategy
+- Offline fallback page (`offline.html`)
+- Vite projects: prefer `vite-plugin-pwa` over manual SW
 
 ---
 
 ### Phase 4: Polish & Verify
 
 **Visual polish checklist:**
-- [ ] Typography: Are display and body fonts visually distinct and harmonious?
-- [ ] Color: Is the palette cohesive? Do accents draw the eye to the right places?
-- [ ] Spacing: Is there enough breathing room between sections? (minimum `--space-20` between major sections)
-- [ ] Motion: Does the page feel alive on load? Are hover states immediate and satisfying?
-- [ ] Backgrounds: Is there depth, texture, or gradient — or is it a flat color?
-- [ ] Responsive: Does it look great at 375px? 768px? 1280px? No horizontal overflow?
-- [ ] Touch: Are all interactive targets ≥ 44px? Does navigation work on mobile?
-- [ ] PWA (if applicable): Does Lighthouse PWA score 100? Is offline fallback working?
+- [ ] Typography: display and body fonts visually distinct and harmonious?
+- [ ] Color: palette cohesive? Accents draw eye correctly?
+- [ ] Spacing: breathing room between sections? (min `--space-20` between major sections)
+- [ ] Motion: page feels alive on load? Hover states immediate and satisfying?
+- [ ] Backgrounds: depth/texture/gradient — not flat color?
+- [ ] Responsive: looks great at 375/768/1280px? No horizontal overflow?
+- [ ] Touch: all targets ≥ 44px? Mobile nav works?
+- [ ] PWA (if applicable): Lighthouse PWA 100? Offline fallback works?
 
 **Accessibility verification:**
 ```bash
-# Run the visual audit after starting your dev server
 bash .claude/skills/frontend-design/scripts/visual-audit.sh http://localhost:[port]
 ```
 
-The audit checks:
-- Color contrast violations (WCAG AA minimum — 4.5:1 for text)
-- Missing alt text, accessible names, and ARIA labels
-- Skip link presence
-- Semantic heading structure (one `<h1>` per page)
-- Font loading performance (CLS)
-- `prefers-reduced-motion` override presence
+The audit checks: color contrast (WCAG AA 4.5:1), missing alt/accessible names/ARIA, skip link, semantic heading structure (one `<h1>`), font loading (CLS), `prefers-reduced-motion` override.
 
-**Fix all CRITICAL issues before marking the task complete.** Warnings are acceptable if documented.
+**Fix all CRITICAL issues before marking complete.** Warnings acceptable if documented.
 
 ---
 
 ## Anti-Pattern Catalog
 
-These are the most common ways agents produce generic output. Identify and avoid them.
-
 | Anti-Pattern | What It Looks Like | Fix |
 |---|---|---|
-| **Gradient Soup** | Purple-to-blue gradient on white cards everywhere | Use one deliberate gradient for ONE element (hero BG, accent bar). Source from `color-palettes.md`. |
-| **Font Stack Collapse** | Entire page in Inter, Roboto, or system fonts | Pick a pairing from `typography.md`. Always use 2 distinct fonts with clear display/body roles. |
-| **Shadow Boxing** | `box-shadow: 0 4px 6px rgba(0,0,0,0.1)` on every card | Use `--shadow-sm` for resting, `--shadow-md` for hover. Never apply the same shadow everywhere. |
-| **Animation Scatter** | Random `transition: all 0.3s ease` on dozens of elements | Use `--transition-all-interactions` only for interactive elements. Apply entrance animations sparingly. |
-| **Whitespace Desert** | Cramped layout with 16px gaps between everything | Section padding minimum `--space-16`. Hero sections minimum `100svh`. Let content breathe. |
-| **Button Rainbow** | 5 different button colors across a single page | One `--primary` button, one `--secondary`, one `--ghost`. That's the system. |
-| **Flat Backgrounds** | Solid `#1a1a2e` with nothing else | Add texture: gradient mesh, noise overlay, subtle pattern, or a layered radial gradient. |
-| **Generic Layout** | Centered content, full-width rows, constant padding | Use a layout composition from `references/layout-compositions.md`. Break the grid deliberately. |
-| **Hover Nothing** | No state change on hover for interactive elements | Every card, button, and link needs a hover state. Minimum: color change. Better: lift + shadow. |
-| **One-Size Typography** | Body text size used for everything | Use the full type scale. Hero in `--text-hero`, section headings in `--text-3xl`, body in `--text-base`. |
-| **Desktop-First CSS** | `max-width` breakpoints everywhere, mobile layout breaks | Write base styles for mobile. Layer up with `min-width`. See `mobile-responsive.md`. |
-| **Tiny Tap Targets** | 24px buttons, links with no padding on mobile | Minimum 44×44px interactive area. Expand with padding or `::after` pseudo-element. |
+| **Gradient Soup** | Purple-to-blue gradient on white cards everywhere | One deliberate gradient for ONE element. Source from `color-palettes.md`. |
+| **Font Stack Collapse** | Entire page in Inter/Roboto/system | Pick a pairing from `typography.md`. 2 distinct fonts with display/body roles. |
+| **Shadow Boxing** | `box-shadow: 0 4px 6px rgba(0,0,0,0.1)` everywhere | `--shadow-sm` resting, `--shadow-md` hover. Never same shadow everywhere. |
+| **Animation Scatter** | `transition: all 0.3s ease` on dozens of elements | `--transition-all-interactions` only for interactive. Apply entrance animations sparingly. |
+| **Whitespace Desert** | Cramped 16px gaps everywhere | Section padding min `--space-16`. Hero min `100svh`. Let content breathe. |
+| **Button Rainbow** | 5 button colors on one page | One `--primary`, one `--secondary`, one `--ghost`. |
+| **Flat Backgrounds** | Solid `#1a1a2e` with nothing else | Add texture: gradient mesh, noise overlay, subtle pattern, layered radial gradient. |
+| **Generic Layout** | Centered content, full-width rows, constant padding | Use a layout composition. Break the grid deliberately. |
+| **Hover Nothing** | No state change on hover | Every card/button/link needs hover. Min: color change. Better: lift + shadow. |
+| **One-Size Typography** | Body text size for everything | Use full type scale. Hero `--text-hero`, headings `--text-3xl`, body `--text-base`. |
+| **Desktop-First CSS** | `max-width` breakpoints everywhere, mobile breaks | Mobile-first base, layer up with `min-width`. |
+| **Tiny Tap Targets** | 24px buttons, links no padding on mobile | Min 44×44px. Expand with padding or `::after`. |
 
 ---
 
 ## Reference Modules
 
-Load these when implementing. Don't rely on memory — read the module.
-
 | Module | When to Load |
 |---|---|
 | `references/typography.md` | Choosing fonts — 30 curated pairings |
 | `references/color-palettes.md` | Choosing colors — 15 named palettes, light + dark |
-| `references/motion-patterns.md` | Implementing animations — entrance, hover, scroll, micro |
+| `references/motion-patterns.md` | Animations — entrance, hover, scroll, micro |
 | `references/layout-compositions.md` | Structuring pages — 15 named compositions |
-| `references/mobile-responsive.md` | Mobile-first methodology, touch targets, viewport units, navigation patterns |
-| `references/pwa-checklist.md` | Manifest, service worker, offline fallback, install prompt, Lighthouse PWA |
+| `references/mobile-responsive.md` | Mobile-first, touch targets, viewport units, navigation |
+| `references/pwa-checklist.md` | Manifest, service worker, offline, install, Lighthouse |
 | `frameworks/vue.md` | Building in Vue 3 |
 | `frameworks/html-css.md` | Building in HTML/CSS |
 | `examples/design-tokens.css` | Starting a token system |
@@ -157,12 +137,10 @@ Load these when implementing. Don't rely on memory — read the module.
 ## Rule Compliance
 
 Before marking complete, verify:
-- **Project Structure** — component organization follows `project-structure.md`
-- **Testing** — component tests follow `testing-strategy.md`
+- **Project Structure** — `project-structure.md`
+- **Testing** — `testing-strategy.md`
 - **Security** — XSS prevention, no `innerHTML` with unescaped user data (`security-principles.md`)
-- **Accessibility** — WCAG AA contrast, keyboard navigation, semantic HTML (`accessibility-principles.md`)
+- **Accessibility** — WCAG AA contrast, keyboard nav, semantic HTML (`accessibility-principles.md`)
 - **Audit script** — visual-audit.sh passes with no CRITICAL failures
 
-**IMPORTANT:** Implementation complexity must match the aesthetic vision. Maximalist designs require elaborate animation. Minimalist designs require meticulous spacing precision. Both fail if executed without care.
-
-Remember: you are capable of extraordinary creative work. These references exist to ground your output in concrete, actionable choices — not to constrain your creativity. Use them as a launching pad.
+**IMPORTANT:** Implementation complexity must match aesthetic vision. Maximalist requires elaborate animation; minimalist requires meticulous spacing. Both fail without care.

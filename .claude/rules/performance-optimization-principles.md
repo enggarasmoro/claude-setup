@@ -77,7 +77,7 @@
 **Connection Pooling:**
 
 - Reuse expensive resources (database connections, HTTP connections)
-- See Resource and Memory Management Principles @resources-and-memory-management-principles.md for pool sizing and configuration
+- See Resource and Memory Management Principles resources-and-memory-management-principles.md for pool sizing and configuration
 
 ### Performance Optimization Checklist
 
@@ -90,6 +90,6 @@
 - [ ] Have you measured improvement after optimization?
 
 ### Related Principles
-- Resource and Memory Management Principles @resources-and-memory-management-principles.md
-- Concurrency and Threading Mandate @concurrency-and-threading-mandate.md
-- Concurrency and Threading Principles @concurrency-and-threading-principles.md
+- Resource and Memory Management Principles resources-and-memory-management-principles.md
+- Concurrency and Threading Mandate concurrency-and-threading-mandate.md
+- Concurrency and Threading Principles concurrency-and-threading-principles.md

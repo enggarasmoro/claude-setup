@@ -74,8 +74,8 @@ are the same. The specific client library belongs in project-level configuration
 - [ ] Timeouts on all external calls?
 
 ### Related Principles
-- Logging and Observability Mandate @logging-and-observability-mandate.md
-- Logging and Observability Principles @logging-and-observability-principles.md
-- Error Handling Principles @error-handling-principles.md
-- Resource and Memory Management Principles @resources-and-memory-management-principles.md
-- Concurrency and Threading Principles @concurrency-and-threading-principles.md
+- Logging and Observability Mandate logging-and-observability-mandate.md
+- Logging and Observability Principles logging-and-observability-principles.md
+- Error Handling Principles error-handling-principles.md
+- Resource and Memory Management Principles resources-and-memory-management-principles.md
+- Concurrency and Threading Principles concurrency-and-threading-principles.md

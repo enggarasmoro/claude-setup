@@ -55,5 +55,5 @@
 - [ ] Are unused imports removed?
 
 ### Related Principles
-- Security Mandate @security-mandate.md
-- Security Principles @security-principles.md
+- Security Mandate security-mandate.md
+- Security Principles security-principles.md

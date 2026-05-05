@@ -78,6 +78,6 @@ chore/update-deps
 - [ ] Commit messages explain why, not just what?
 
 ### Related Principles
-- Code Completion Mandate @code-completion-mandate.md
-- Testing Strategy @testing-strategy.md
-- Security Mandate @security-mandate.md
+- Code Completion Mandate code-completion-mandate.md
+- Testing Strategy testing-strategy.md
+- Security Mandate security-mandate.md

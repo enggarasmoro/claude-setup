@@ -66,6 +66,6 @@ defer func() {
 ---
 
 ## References
-- Go Idioms and Patterns @go-idioms-and-patterns.md (§ Idiomatic Patterns, § Formatting and Static Analysis)
-- Logging and Observability Principles @logging-and-observability-principles.md (§ Go/slog)
-- Error Handling Principles @error-handling-principles.md (§ Resource Cleanup)
+- Go Idioms and Patterns go-idioms-and-patterns.md (§ Idiomatic Patterns, § Formatting and Static Analysis)
+- Logging and Observability Principles logging-and-observability-principles.md (§ Go/slog)
+- Error Handling Principles error-handling-principles.md (§ Resource Cleanup)

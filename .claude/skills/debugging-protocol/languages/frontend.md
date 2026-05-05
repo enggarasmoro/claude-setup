@@ -335,8 +335,8 @@ User clicks link → Router navigates → Old component should leave → New com
 ---
 
 ## Related Principles
-- Vue Idioms and Patterns @vue-idioms-and-patterns.md
-- TypeScript Idioms and Patterns @typescript-idioms-and-patterns.md
-- Error Handling Principles @error-handling-principles.md
-- Logging and Observability Principles @logging-and-observability-principles.md
-- Testing Strategy @testing-strategy.md
+- Vue Idioms and Patterns vue-idioms-and-patterns.md
+- TypeScript Idioms and Patterns typescript-idioms-and-patterns.md
+- Error Handling Principles error-handling-principles.md
+- Logging and Observability Principles logging-and-observability-principles.md
+- Testing Strategy testing-strategy.md

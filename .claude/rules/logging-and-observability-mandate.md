@@ -2,7 +2,7 @@
 
 ### Observability Overview
 
-Observability is built on **three pillars** — this mandate governs Logs. For Metrics and Health Checks, see Monitoring and Alerting Principles @monitoring-and-alerting-principles.md.
+Observability is built on **three pillars** — this mandate governs Logs. For Metrics and Health Checks, see Monitoring and Alerting Principles monitoring-and-alerting-principles.md.
 
 1. **Logs** — *What happened* (events, errors, state changes) — governed by this file
 2. **Metrics** — *How much / how many* (quantitative measurements, RED/USE) — see `monitoring-and-alerting-principles.md`
@@ -45,10 +45,10 @@ Prefer middleware, decorators, or framework interceptors for automatic operation
 
 ### Implementation Guide
 
-For log levels, structured logging patterns, language-specific implementations, security considerations, and code examples, see Logging and Observability Principles @logging-and-observability-principles.md.
+For log levels, structured logging patterns, language-specific implementations, security considerations, and code examples, see Logging and Observability Principles logging-and-observability-principles.md.
 
 ### Related Principles
-- Logging and Observability Principles @logging-and-observability-principles.md
-- Monitoring and Alerting Principles @monitoring-and-alerting-principles.md
-- Error Handling Principles @error-handling-principles.md
-- API Design Principles @api-design-principles.md
+- Logging and Observability Principles logging-and-observability-principles.md
+- Monitoring and Alerting Principles monitoring-and-alerting-principles.md
+- Error Handling Principles error-handling-principles.md
+- API Design Principles api-design-principles.md

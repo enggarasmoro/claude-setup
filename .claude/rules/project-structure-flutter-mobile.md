@@ -108,5 +108,5 @@ Tests live in the `test/` directory, mirroring the `lib/` layout. This is Flutte
 - **Structure:** Mirror the feature directory structure from `lib/`
 
 ### Related Principles
-- Project Structure @project-structure.md (core philosophy)
-- Flutter Idioms and Patterns @flutter-idioms-and-patterns.md (Riverpod 3 patterns, widget idioms)
+- Project Structure project-structure.md (core philosophy)
+- Flutter Idioms and Patterns flutter-idioms-and-patterns.md (Riverpod 3 patterns, widget idioms)

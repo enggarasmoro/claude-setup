@@ -2,161 +2,102 @@
 
 ### Test Pyramid
 
-**Unit Tests (70% of tests):**
+**Unit Tests (70%):** Test domain logic in isolation with mocked dependencies. Fast (<100ms). Single function/class/module. All external deps mocked. Coverage goal: >85% of domain logic.
 
-- **What:** Test domain logic in isolation with mocked dependencies  
-- **Speed:** Fast (<100ms per test)  
-- **Scope:** Single function, class, or module  
-- **Dependencies:** All external dependencies mocked (repositories, APIs, time, random)  
-- **Coverage Goal:** >85% of domain logic
+**Integration Tests (20%):** Test adapters against real infrastructure. Medium (100ms-5s). Component + infra (DB, cache, queues). Real infra via Testcontainers. Coverage: all adapter implementations + critical integration points.
 
-**Integration Tests (20% of tests):**
-
-- **What:** Test adapters against real infrastructure  
-- **Speed:** Medium (100ms-5s per test)  
-- **Scope:** Component interaction with infrastructure (database, cache, message queue)  
-- **Dependencies:** Real infrastructure via Testcontainers  
-- **Coverage Goal:** All adapter implementations, critical integration points
-
-**End-to-End Tests (10% of tests):**
-
-- **What:** Test complete user journeys through all layers  
-- **Speed:** Slow (5s-30s per test)  
-- **Scope:** Full system from HTTP request to database and back  
-- **Dependencies:** Entire system running (or close approximation)  
-- **Coverage Goal:** Happy paths, critical business flows
+**End-to-End Tests (10%):** Complete user journeys through all layers. Slow (5s-30s). Full system HTTP→DB→back. Entire system running. Coverage: happy paths + critical business flows.
 
 ### Test-Driven Development (TDD)
 
 **Red-Green-Refactor Cycle:**
+1. **Red:** Write a failing test
+2. **Green:** Minimal code to pass
+3. **Refactor:** Clean up while green
+4. **Repeat**
 
-1. **Red:** Write a failing test for next bit of functionality  
-2. **Green:** Write minimal code to make test pass  
-3. **Refactor:** Clean up code while keeping tests green  
-4. **Repeat:** Next test
-
-**Benefits:**
-
-- Tests written first ensure testable design  
-- Comprehensive test coverage (code without test doesn't exist)  
-- Faster development (catch bugs immediately, not in QA)  
-- Better design (forces thinking about interfaces before implementation)
+Benefits: testable design, comprehensive coverage, faster feedback, better interfaces.
 
 ### Test Doubles Strategy
 
-**Unit Tests:** Use mocks/stubs for all driven ports
+**Unit Tests:** Mock all driven ports (repositories return canned data, external APIs return success, time/random deterministic).
 
-- Mock repositories return pre-defined data  
-- Mock external APIs return successful responses  
-- Mock time/random for deterministic tests  
-- Control test environment completely
+**Integration Tests:** Real infrastructure — Testcontainers (PostgreSQL, Redis, queues), Firebase emulator (Auth, Firestore, RTDB, Storage, Hosting, Functions, Pub/Sub, Extensions). Test actual queries, connections, transactions.
 
-**Integration Tests:** Use real infrastructure
-
-- Testcontainers spins up PostgreSQL, Redis, message queues  
-- Firebase emulator spins up Firebase Authentication, Cloud Firestore, Realtime Database, Cloud Storage for Firebase, Firebase Hosting, Cloud Functions, Pub/Sub, and Firebase Extensions  
-- Test actual database queries, connection handling, transactions  
-- Verify adapter implementations work with real services
-
-**Best Practice:**
-
-- Generate at least 2 implementations per driven port:  
-  1. Production adapter (PostgreSQL, GCP GCS, etc.)  
-  2. Test adapter (in-memory, fake implementation)
+**Best Practice:** Generate at least 2 implementations per driven port — production adapter + test adapter (in-memory/fake).
 
 ### Test Organization
 
 **Universal Rule: Co-locate implementation tests; Separate system tests.**
 
 **1. Unit & Integration Tests (Co-located)**
-- **Rule:** Place tests **next to the file** they test.
-- **Why:** Keeps tests visible, encourages maintenance, and supports refactoring (moving a file moves its tests).
-- **Naming Convention Example:**
+- **Rule:** Place tests next to the file they test.
+- **Why:** Visible, encourages maintenance, refactor-safe.
+- **Naming:**
   - **TS/JS:** `*.spec.ts` (Unit), `*.integration.spec.ts` (Integration)
-  - **Go:** `*_test.go` (Unit), `*_integration_test.go` (Integration)
-  - **Dart/Flutter:** `*_test.dart` (Unit), `*_integration_test.dart` (Integration) — tests live in `test/` mirroring `lib/` layout (Flutter's default convention, discovered by `flutter test`)
-  - **Python:** `test_*.py` (Unit), `test_*_integration.py` (Integration)
+  - **Go:** `*_test.go`, `*_integration_test.go`
+  - **Dart/Flutter:** `*_test.dart`, `*_integration_test.dart` — tests live in `test/` mirroring `lib/` (Flutter default)
+  - **Python:** `test_*.py`, `test_*_integration.py`
   - **Java:** `*Test.java` (Unit), `*IT.java` (Integration)
-  - **Rust:** `#[cfg(test)] mod tests` inline in each `.rs` file (Unit), `tests/` directory at crate root (Integration)
-  > You must strictly follow the convention for the target language. Do not mix `test` and `spec` suffixes in the same application context.
-  > **Language-specific overrides:** Some ecosystems have different test location conventions. When a language-specific project structure file exists (e.g., `project-structure-flutter-mobile.md`, `project-structure-rust-cargo.md`), its test location rules take precedence over the co-location default. See `architectural-pattern.md` § Test co-location for the authoritative rule.
-  > **Rust exception:** Rust unit tests are **inline** (`#[cfg(test)] mod tests` at the bottom of each `.rs` file), not separate files. This is the official Rust convention — it enables testing private functions and is how `cargo test` discovers unit tests. Integration tests go in `tests/` at the crate root, compiled as separate crates. See `rust-idioms-and-patterns.md` for details.
+  - **Rust:** `#[cfg(test)] mod tests` inline in each `.rs` (Unit); `tests/` directory at crate root (Integration)
+
+  > Strictly follow the convention for the target language. Don't mix `test`/`spec` in the same context.
+  > **Language-specific overrides** (Flutter, Rust): see `project-structure-*` and `architectural-pattern.md` § Test co-location.
+  > **Rust exception:** unit tests are inline `#[cfg(test)] mod tests` — official Rust convention enabling private function testing. Integration tests in `tests/` are separate crates.
 
 **2. End-to-End Tests (Separate)**
-- **Rule:** Place in a dedicated `e2e/` folder
-  - **Single app:** `e2e/` at project root
-  - **Monorepo:** `apps/e2e/` subdivided by test scope:
-    - `apps/e2e/api/` for full API flow E2E tests (HTTP → Database)
-    - `apps/e2e/ui/` for full-stack E2E tests (Browser → Backend → Database)
-  > Path adapts to project type per `project-structure.md` § Adapting for Different Project Types.
-- **Naming:** Follow `{feature}-{ui/api}.e2e.test.{ext}` (Universal - configure test runner to match this pattern `**/*.e2e.test.*`)
-  - Example: 
-    - `user-registration-api.e2e.test.ts`       # Full API flow: HTTP → DB
-    - `user-registration-ui.e2e.test.ts`        # Full-stack: Browser → Backend → DB
+- **Rule:** Dedicated `e2e/` folder
+  - Single app: `e2e/` at project root
+  - Monorepo: `apps/e2e/api/` (HTTP→DB) and `apps/e2e/ui/` (Browser→Backend→DB)
+- **Naming:** `{feature}-{ui/api}.e2e.test.{ext}` — runner pattern `**/*.e2e.test.*`
+  - `user-registration-api.e2e.test.ts`
+  - `user-registration-ui.e2e.test.ts`
 
-**Using Playwright MCP for UI E2E Tests:**
-
-When running E2E tests interactively (during development or verification), use Playwright MCP:
-
+**Using Playwright MCP for UI E2E:**
 ```
-# Navigate to the page
 mcp_playwright_browser_navigate(url="http://localhost:5173/login")
-
-# Capture accessible state (better than screenshot for assertions)
-mcp_playwright_browser_snapshot()
-
-# Interact with elements by ref from snapshot
+mcp_playwright_browser_snapshot()                              # accessibility tree (better than screenshot)
 mcp_playwright_browser_type(ref="<ref>", text="test@example.com")
 mcp_playwright_browser_click(ref="<ref>")
-
-# Wait for results
 mcp_playwright_browser_wait_for(text="Welcome")
-
-# Capture snapshot for walkthrough documentation (captures full accessibility tree)
 mcp_playwright_browser_snapshot(filename="login-success.md")
 ```
 
 **E2E Test Requirements:**
-- Capture a snapshot (`mcp_playwright_browser_snapshot`) at each major step
-- Save snapshots to walkthrough as proof of functionality
-- If visual proof is needed, use `browser_subagent` with `RecordingName` to produce a recorded video artifact
+- Capture a snapshot at each major step; save to walkthrough as proof
+- For visual proof, use `browser_subagent` with `RecordingName` for video artifact
 - Test happy path AND at least one error path
-- Clean up test data after test (or use unique identifiers)
+- Clean up test data (or use unique identifiers)
 
 **Key Principles:**
-- **Unit/Integration tests**: Co-located with implementation
-- **E2E tests**: Separate directory (crosses boundaries)
-- **Test doubles**: Co-located with interface (storage_mock.go, taskAPI.mock.ts)
-- **Pattern consistency**: All features follow same structure  
+- Unit/Integration: co-located with implementation
+- E2E: separate directory (crosses boundaries)
+- Test doubles: co-located with interface (`storage_mock.go`, `taskAPI.mock.ts`)
+- Pattern consistency: all features follow same structure
 
 ### Test Quality Standards
 
 **AAA Pattern (Arrange-Act-Assert):**
-```
-// Arrange: Set up test data and mocks
+```ts
+// Arrange
 const user = { id: '123', email: 'test@example.com' };
 const mockRepo = createMockRepository();
-
-// Act: Execute the code under test
+// Act
 const result = await userService.createUser(user);
-
-// Assert: Verify expected outcome
+// Assert
 expect(result.id).toBe('123');
 expect(mockRepo.save).toHaveBeenCalledWith(user);
 ```
-**Test Naming:**
 
-- Descriptive: `should [expected behavior] when [condition]`  
-- Examples:  
-  - `should return 404 when user not found`  
-  - `should hash password before saving to database`  
-  - `should reject email with invalid format`
+**Test Naming:** `should [expected behavior] when [condition]`
+- `should return 404 when user not found`
+- `should hash password before saving to database`
+- `should reject email with invalid format`
 
 **Coverage Requirements:**
-
-- Unit tests: >85% code coverage  
-- Integration tests: All adapter implementations  
-- E2E tests: Critical user journeys
+- Unit: >85% code coverage
+- Integration: all adapter implementations
+- E2E: critical user journeys
 
 ### Related Principles
 - Architectural Patterns — Testability-First Design @architectural-pattern.md

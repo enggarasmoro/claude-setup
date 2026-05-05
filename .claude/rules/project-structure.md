@@ -24,10 +24,10 @@ Each layout follows the universal philosophy above. Load the relevant layout whe
 
 | Layout             | File                                 | When to Use                          |
 | ------------------ | ------------------------------------ | ------------------------------------ |
-| Go Backend         | @project-structure-go-backend.md     | Go services, APIs, CLI tools         |
-| Vue/React Frontend | @project-structure-vue-frontend.md   | Web frontends (Vue, React, Svelte)   |
-| Flutter/Mobile     | @project-structure-flutter-mobile.md | Mobile apps (Flutter, React Native)  |
-| Rust/Cargo         | @project-structure-rust-cargo.md     | Rust binaries, libraries, workspaces |
+| Go Backend         | project-structure-go-backend.md     | Go services, APIs, CLI tools         |
+| Vue/React Frontend | project-structure-vue-frontend.md   | Web frontends (Vue, React, Svelte)   |
+| Flutter/Mobile     | project-structure-flutter-mobile.md | Mobile apps (Flutter, React Native)  |
+| Rust/Cargo         | project-structure-rust-cargo.md     | Rust binaries, libraries, workspaces |
 
 > This Feature/Domain/UI/API structure is framework-agnostic. It applies equally to any language or framework. The layout files provide language-specific conventions (file naming, module systems, test locations) while preserving the vertical slice architecture.
 
@@ -74,6 +74,6 @@ src/
 - Services communicate via API calls or message queues, never direct imports
 
 ### Related Principles
-- Code Organization Principles @code-organization-principles.md
-- Architectural Patterns — Testability-First Design @architectural-pattern.md
+- Code Organization Principles code-organization-principles.md
+- Architectural Patterns — Testability-First Design architectural-pattern.md
 

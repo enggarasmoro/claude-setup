@@ -2,180 +2,102 @@
 
 ### Core Philosophy
 
-Rust's type system and ownership model are your primary tools for correctness. Lean into the compiler — it is your strongest ally. Write code that is idiomatic, safe, and expressive.
+Rust's type system and ownership model are your primary tools for correctness. Lean into the compiler.
 
-> **Scope:** This file covers Rust-specific *coding idioms*. For file layout, see `project-structure-rust-cargo.md`. For test naming conventions, see `testing-strategy.md`. For logging library choice, see `logging-and-observability-principles.md`.
+> **Scope:** Rust coding idioms. Layout: `project-structure-rust-cargo.md`. Test naming: `testing-strategy.md`. Logging: `logging-and-observability-principles.md`.
 
 ### Ownership and Borrowing
 
 1. **Prefer borrowing (`&T`, `&mut T`) over cloning**
-   - Never `.clone()` to silence the borrow checker without a `// CLONE:` comment explaining why
-   - Use `Cow<'_, T>` when a function may or may not need ownership
-   - Prefer `&str` over `String` in function parameters, `&[T]` over `Vec<T>`
-
-2. **Minimize owned data in structs**
-   - Use references with explicit lifetimes when the struct is short-lived
-   - Use owned types (`String`, `Vec<T>`) when the struct must outlive its inputs
-
-3. **Avoid unnecessary `Arc<Mutex<T>>`**
-   - If data flows one direction, use channels (`tokio::sync::mpsc`)
-   - If data is read-heavy, consider `RwLock` over `Mutex`
-   - If data is immutable after init, use `Arc<T>` without a lock
+   - Never `.clone()` to silence the borrow checker without a `// CLONE:` comment
+   - Use `Cow<'_, T>` when ownership is conditional
+   - Prefer `&str` over `String`, `&[T]` over `Vec<T>` in parameters
+2. **Minimize owned data in structs** — references with explicit lifetimes for short-lived structs; owned types when struct outlives inputs
+3. **Avoid unnecessary `Arc<Mutex<T>>`** — channels (`tokio::sync::mpsc`) for one-direction flow; `RwLock` for read-heavy; `Arc<T>` (no lock) for immutable-after-init
 
 ### Error Handling
 
-1. **Use the `?` operator for propagation — never `unwrap()` in production code**
-   - `unwrap()` and `expect()` are acceptable only in:
-     - Tests (`#[test]`, `#[tokio::test]`)
-     - Infallible operations where the invariant is proven (document with `// SAFETY:` comment)
-     - CLI `main()` function with clear error messages via `expect("reason")`
-
+1. **Use `?` for propagation — never `unwrap()` in production code**
+   - `unwrap()`/`expect()` only acceptable in: tests, infallible operations (with `// SAFETY:` comment), CLI `main()` with `expect("reason")`
 2. **Choose error crates by context:**
-   - Library code: `thiserror` — define typed error enums
-   - Application code: `anyhow` — ergonomic error chaining
-   - Never mix: library crates should not depend on `anyhow`
-
+   - Library: `thiserror` (typed enums)
+   - Application: `anyhow` (ergonomic chaining)
+   - Never mix: libraries must not depend on `anyhow`
 3. **Error type design:**
 
 ```rust
-// ✅ Good — typed, matchable errors
+// ✅ Typed, matchable
 #[derive(Debug, thiserror::Error)]
 pub enum PathfinderError {
-    #[error("file not found: {path}")]
-    FileNotFound { path: PathBuf },
-    #[error("AST parse failed: {0}")]
-    ParseError(String),
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
+    #[error("file not found: {path}")] FileNotFound { path: PathBuf },
+    #[error(transparent)] Io(#[from] std::io::Error),
 }
+// ❌ Stringly-typed: fn do_thing() -> Result<(), String>
 
-// ❌ Bad — stringly-typed, unmatchable
-fn do_thing() -> Result<(), String> { ... }
-
-// ✅ Annotate public Result-producing functions to force callers to handle them
+// ✅ #[must_use] forces callers to handle Result
 #[must_use]
 pub fn create_task(req: CreateTaskRequest) -> Result<Task, TaskError> { ... }
-
-// Triggers a compiler warning when the return value is fully ignored:
-//   create_task(req);          // warning: unused `Result` that must be used
-//
-// This does NOT trigger the warning (intentional discard — still valid when used deliberately):
-//   let _ = create_task(req);  // explicit discard, silences warning by design
+// `create_task(req);` warns; `let _ = create_task(req);` is intentional discard.
 ```
 
 ### Async and Concurrency
 
-1. **Use `tokio` as the async runtime**
-   - Mark async entry points with `#[tokio::main]` or `#[tokio::test]`
-   - Prefer `tokio::spawn` for concurrent tasks, not `std::thread::spawn`
-   - Use `tokio::select!` for racing futures, not manual polling
-
-2. **Cancellation safety:**
-   - Prefer `tokio::sync::mpsc` over `tokio::sync::broadcast` unless fan-out is needed
-   - Document cancellation behavior on any `async fn` that holds resources across `.await`
-   - Use `tokio_util::sync::CancellationToken` for graceful shutdown
-
-3. **Blocking operations:**
-   - Never call blocking I/O inside async context
-   - Use `tokio::task::spawn_blocking` for CPU-heavy or blocking work
-   - Use `tokio::fs` instead of `std::fs` inside async functions
+1. **Use `tokio` as the async runtime** — `#[tokio::main]`/`#[tokio::test]`; prefer `tokio::spawn` over `std::thread::spawn`; `tokio::select!` for racing futures
+2. **Cancellation safety:** prefer `mpsc` over `broadcast` unless fan-out needed; document cancellation on async fns holding resources across `.await`; use `CancellationToken` for graceful shutdown
+3. **Blocking operations:** never call blocking I/O in async; use `tokio::task::spawn_blocking` for CPU-heavy/blocking; use `tokio::fs` not `std::fs`
 
 ### Unsafe Code
 
-1. **Zero `unsafe` blocks unless in FFI boundaries**
-   - Tree-sitter C bindings and similar FFI are the only valid use case
-   - Every `unsafe` block must have a `// SAFETY:` comment explaining the invariant
-
-2. **Minimize unsafe surface area:**
-   - Encapsulate `unsafe` in a safe wrapper function
-   - The wrapper's public API must be safe to call from any context
-   - Write tests that exercise the boundary conditions of `unsafe` wrappers
-
-3. **Never use `unsafe` to bypass the borrow checker** — restructure the code instead
+1. **Zero `unsafe` blocks unless in FFI boundaries** — every `unsafe` needs a `// SAFETY:` comment explaining the invariant
+2. **Minimize unsafe surface area** — encapsulate in safe wrappers; wrapper's public API must be safe; test boundary conditions
+3. **Never use `unsafe` to bypass the borrow checker** — restructure instead
 
 ### Lifetimes and Generics
 
-1. **Prefer `'_` lifetime elision when possible**
-   - Only introduce named lifetimes when the compiler requires them or when they clarify intent
-   - Use `'a` for single lifetime parameters, descriptive names (`'input`, `'query`) for multiple
-
-2. **Keep generic bounds simple:**
-   - Prefer concrete types for prototyping, introduce generics when the pattern stabilizes
-   - Use `impl Trait` in argument position for simple cases
-   - Use `where` clauses for complex bounds — never inline complex bounds in `<...>`
-
-3. **Avoid lifetime gymnastics:**
-   - If lifetime annotations become complex, restructure to use owned data or `Arc`
-   - Consider the "split borrow" pattern to avoid borrow checker issues in struct methods
+1. **Prefer `'_` lifetime elision** — named lifetimes only when compiler requires or when they clarify intent
+2. **Keep generic bounds simple** — concrete first, generics when pattern stabilizes; `impl Trait` in argument position; `where` clauses for complex bounds
+3. **Avoid lifetime gymnastics** — restructure to owned data or `Arc`; consider split borrow pattern
 
 ### Idiomatic Patterns
 
-1. **Builder pattern** for types with many optional fields:
-   - Return `Self` from builder methods for chaining
-   - `build()` returns `Result<T, BuildError>`, not `T`
-
-2. **Newtype pattern** for domain types:
-   - Wrap primitives: `struct UserId(u64)`, not bare `u64`
-   - Implement `Deref` only when the newtype truly "is-a" the inner type
-
-3. **Typestate pattern** for state machines:
-   - Different states = different types — invalid transitions are compile errors
-   - Use this for protocol implementations and lifecycle management
-
-4. **`From`/`Into` conversions:**
-   - Implement `From<A> for B` (never `Into` directly)
-   - Use `impl From<X> for Error` with `thiserror`'s `#[from]` attribute
+1. **Builder pattern** — return `Self` for chaining; `build()` returns `Result<T, BuildError>`
+2. **Newtype pattern** — `struct UserId(u64)` over bare primitives; implement `Deref` only for true "is-a"
+3. **Typestate pattern** — different states = different types; invalid transitions are compile errors
+4. **`From`/`Into` conversions** — implement `From<A> for B` (never `Into` directly); use `#[from]` with thiserror
 
 ### Testing
 
 1. **Test organization (Rust-specific — differs from Go/TS):**
-   - **Unit tests:** `#[cfg(test)] mod tests` block **at the bottom of each `.rs` file** — this is the idiomatic Rust convention, not a shortcut
-     - Tests can access private functions via `use super::*`
-     - Code inside `#[cfg(test)]` is stripped from production builds
-     - Do NOT create separate `*_test.rs` files — this breaks private access and is non-idiomatic
-   - **Integration tests:** `tests/` directory at crate root (each file compiled as a separate crate)
-     - Only tests public API — use `use my_crate::function;`
-     - No `#[cfg(test)]` annotation needed
-     - Shared helpers: `tests/common/mod.rs` (NOT `tests/common.rs`, which Cargo treats as a test file)
+   - **Unit tests:** `#[cfg(test)] mod tests` block **at the bottom of each `.rs` file** — official idiomatic convention. Access private functions via `use super::*`. Stripped from production builds. Do NOT create separate `*_test.rs` files.
+   - **Integration tests:** `tests/` directory at crate root (each file = separate crate, public API only). No `#[cfg(test)]` needed. Shared helpers: `tests/common/mod.rs` (NOT `tests/common.rs`).
    - Use `#[tokio::test]` for async tests
-
 2. **Test naming:** `fn test_<function>_<scenario>_<expected>()` (snake_case)
-
-3. **Assertions:**
-   - Use `assert_eq!` / `assert_ne!` over `assert!(a == b)` — better error messages
-   - Use `assert!(matches!(result, Ok(_)))` for enum variant checking
-
-4. **Property testing:** Use `proptest` or `quickcheck` for functions with wide input spaces
+3. **Assertions:** `assert_eq!`/`assert_ne!` over `assert!(a == b)`; `assert!(matches!(result, Ok(_)))` for variant checking
+4. **Property testing:** `proptest` or `quickcheck` for wide input spaces
 
 ### Clippy and Formatting
 
-1. **`cargo check` for fast iteration during development**
-   - `cargo check`: type-checks without producing a binary — fastest feedback loop
-   - `cargo clippy`: includes `cargo check` plus lint rules — use before committing
-   - `cargo build`: only when you need the actual binary/library artifact
-   - Never run `cargo build` during TDD cycles — it is significantly slower than `cargo check`
-
-2. **`cargo clippy` must pass with zero warnings** before any commit
-   - Use `#[allow(clippy::...)]` only with a `// ALLOW:` comment explaining why
-   - Prefer fixing the lint over suppressing it
-
-3. **`cargo fmt` is non-negotiable** — all code must be formatted
-
-4. **Recommended project-level Clippy configuration (`.clippy.toml` or `Cargo.toml`):**
-
-```toml
-[lints.clippy]
-pedantic = "warn"
-unwrap_used = "deny"
-expect_used = "warn"
-```
+1. **`cargo check` for fast iteration**
+   - `cargo check`: type-checks without binary — fastest feedback
+   - `cargo clippy`: includes check + lint — use before commit
+   - `cargo build`: only when artifact needed
+   - Never `cargo build` during TDD cycles
+2. **`cargo clippy` must pass with zero warnings before any commit** — `#[allow(clippy::...)]` only with `// ALLOW:` rationale; prefer fix over suppression
+3. **`cargo fmt` is non-negotiable**
+4. **Recommended Clippy config:**
+   ```toml
+   [lints.clippy]
+   pedantic = "warn"
+   unwrap_used = "deny"
+   expect_used = "warn"
+   ```
 
 ### Dependency Management
 
-1. **Minimize dependency count** — each dependency is an attack surface and compile-time cost
-2. **Pin major versions** in `Cargo.toml` — use `dep = "1"` not `dep = "*"`
-3. **Audit regularly** — run `cargo audit` to check for known vulnerabilities
-4. **Prefer well-maintained crates** — check download count, last commit date, and issue tracker
+1. **Minimize dependency count** — each is attack surface + compile cost
+2. **Pin major versions** — `dep = "1"` not `dep = "*"`
+3. **Audit regularly** — `cargo audit`
+4. **Prefer well-maintained crates** — check downloads, last commit, issues
 
 ### Related Principles
 - Error Handling Principles @error-handling-principles.md

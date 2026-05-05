@@ -30,8 +30,8 @@ When in doubt, ask: *"Which choice makes the code more defensible and maintainab
 If both options are equally defensible, choose the simpler one (KISS).
 
 ### Related Principles
-- Security Mandate @security-mandate.md
-- Rugged Software Constitution @rugged-software-constitution.md
-- Code Completion Mandate @code-completion-mandate.md
-- Logging and Observability Mandate @logging-and-observability-mandate.md
-- Architectural Patterns — Testability-First Design @architectural-pattern.md
+- Security Mandate security-mandate.md
+- Rugged Software Constitution rugged-software-constitution.md
+- Code Completion Mandate code-completion-mandate.md
+- Logging and Observability Mandate logging-and-observability-mandate.md
+- Architectural Patterns — Testability-First Design architectural-pattern.md

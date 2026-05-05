@@ -207,5 +207,5 @@ crates/pathfinder-search/
 ```
 
 ### Related Principles
-- Project Structure @project-structure.md (core philosophy)
-- Rust Idioms and Patterns @rust-idioms-and-patterns.md
+- Project Structure project-structure.md (core philosophy)
+- Rust Idioms and Patterns rust-idioms-and-patterns.md

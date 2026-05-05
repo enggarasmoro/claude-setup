@@ -29,14 +29,14 @@ This file defines the universal principle. Each language has a dedicated file wi
 
 | Language / Framework | Idiom File                         | When to Load                                    |
 | -------------------- | ---------------------------------- | ----------------------------------------------- |
-| **Go**               | @go-idioms-and-patterns.md         | Go services, APIs, CLI tools                    |
-| **TypeScript**       | @typescript-idioms-and-patterns.md | Any TypeScript project (backend, frontend, CLI) |
-| **Vue 3**            | @vue-idioms-and-patterns.md        | Vue components, Pinia stores, composables       |
-| **Flutter / Dart**   | @flutter-idioms-and-patterns.md    | Mobile apps, Flutter widgets, Riverpod          |
-| **Rust**             | @rust-idioms-and-patterns.md       | Rust binaries, libraries, workspaces            |
+| **Go**               | go-idioms-and-patterns.md         | Go services, APIs, CLI tools                    |
+| **TypeScript**       | typescript-idioms-and-patterns.md | Any TypeScript project (backend, frontend, CLI) |
+| **Vue 3**            | vue-idioms-and-patterns.md        | Vue components, Pinia stores, composables       |
+| **Flutter / Dart**   | flutter-idioms-and-patterns.md    | Mobile apps, Flutter widgets, Riverpod          |
+| **Rust**             | rust-idioms-and-patterns.md       | Rust binaries, libraries, workspaces            |
 
 > Each language-specific file is independently changeable. It governs only its own ecosystem's coding idioms and defers to the relevant cross-cutting principle files (error handling, testing, logging, etc.) for universal guidance.
 
 ### Related Principles
-- Core Design Principles @core-design-principles.md
-- Code Completion Mandate @code-completion-mandate.md
+- Core Design Principles core-design-principles.md
+- Code Completion Mandate code-completion-mandate.md

@@ -50,5 +50,5 @@ Use this structure for Go backend applications. The vertical slice principle app
 - `go.mod` at the root — single module for the entire application
 
 ### Related Principles
-- Project Structure @project-structure.md (core philosophy)
-- Go Idioms and Patterns @go-idioms-and-patterns.md (coding idioms, error handling, naming)
+- Project Structure project-structure.md (core philosophy)
+- Go Idioms and Patterns go-idioms-and-patterns.md (coding idioms, error handling, naming)

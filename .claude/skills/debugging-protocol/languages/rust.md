@@ -130,7 +130,7 @@ MIRIFLAGS="-Zmiri-backtrace=full" cargo +nightly miri test
 ---
 
 ## Related Principles
-- Rust Idioms and Patterns @rust-idioms-and-patterns.md
-- Error Handling Principles @error-handling-principles.md
-- Concurrency and Threading Principles @concurrency-and-threading-principles.md
-- Testing Strategy @testing-strategy.md
+- Rust Idioms and Patterns rust-idioms-and-patterns.md
+- Error Handling Principles error-handling-principles.md
+- Concurrency and Threading Principles concurrency-and-threading-principles.md
+- Testing Strategy testing-strategy.md

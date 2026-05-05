@@ -4,124 +4,102 @@ description: Full 5-phase workflow for new features — research → implement �
 
 # Build Feature Workflow
 
-**CRITICAL INSTRUCTION**
-
-YOU ARE FORBIDDEN FROM SKIPPING PHASES.
-Treat this file as a state machine. You cannot transition to phase $N+1$ until phase $N$ is fully complete and verified.
+**FORBIDDEN to skip phases.** State machine: cannot transition to phase N+1 until phase N is complete and verified.
 
 ## Role
+Senior Principal Engineer. Strict protocol adherence.
 
-You are a Senior Principal Engineer with a mandate for strict protocol adherence.
-
-Before starting any work, you MUST:
+Before starting:
 1. Read `.claude/rules/rule-priority.md`
-2. Identify which rules apply to this task
-3. Read the relevant rule files — they are non-negotiable constraints
+2. Identify applicable rules
+3. Read relevant rule files — non-negotiable constraints
 
 ---
 
-## Workflow Phases
+## Workflow
 
 ```
 Research → Implement → Integrate → [E2E?] → Verify → Ship
 ```
 
-Every phase must complete before proceeding. Never trade quality gates for velocity.
-
 ---
 
 ### Phase 1: Research
-**Required rules:** `.claude/rules/project-structure.md`, `.claude/rules/architectural-pattern.md`
+**Rules:** `project-structure.md`, `architectural-pattern.md`
 
-1. Analyse the request — what is being asked, what is the scope?
-2. Review the current codebase for existing patterns and dependencies
-3. Search external documentation using WebSearch / WebFetch if needed
-4. Create `task.md` defining the scope and acceptance criteria
-5. Save findings to `docs/research_logs/{feature}.md`
-6. If a significant architecture decision is needed → run `/adr`
+1. Analyse request and scope.
+2. Review codebase for patterns/dependencies.
+3. WebSearch/WebFetch external docs if needed.
+4. Create `task.md` with scope + acceptance criteria.
+5. Save findings to `docs/research_logs/{feature}.md`.
+6. Significant arch decision → run `/adr`.
 
-**Gate:** `task.md` and research log must exist before proceeding.
+**Gate:** `task.md` + research log exist.
 
 ---
 
 ### Phase 2: Implement
-**Required rules:** `.claude/rules/error-handling-principles.md`, `.claude/rules/logging-and-observability-mandate.md`, `.claude/rules/testing-strategy.md`
+**Rules:** `error-handling-principles.md`, `logging-and-observability-mandate.md`, `testing-strategy.md`
 
-1. Follow the TDD cycle: **Red → Green → Refactor**
-2. Create the test file first (co-located with the implementation):
-   - Go: `*_test.go`
-   - TypeScript: `*.spec.ts`
-3. Write failing test → implement → make test pass → refactor
-4. Unit tests must use mocked dependencies
+1. TDD: **Red → Green → Refactor**.
+2. Test file co-located: Go `*_test.go`, TS `*.spec.ts`.
+3. Failing test → implement → pass → refactor.
+4. Unit tests use mocked deps.
 
-**Gate:** All unit tests must pass before proceeding to Phase 3.
+**Gate:** All unit tests pass.
 
 ---
 
 ### Phase 3: Integrate
-**Required rules:** `.claude/rules/testing-strategy.md`, `.claude/rules/resources-and-memory-management-principles.md`
+**Rules:** `testing-strategy.md`, `resources-and-memory-management-principles.md`
 
-REQUIRED if ANY of the following are true:
-- [ ] Storage / repository files were modified or created
-- [ ] External API client files were modified or created
-- [ ] Database queries or schema were changed
-- [ ] Message queue, cache, or I/O adapter code was touched
+REQUIRED if ANY:
+- [ ] Storage/repository files modified
+- [ ] External API client modified
+- [ ] DB queries/schema changed
+- [ ] MQ/cache/IO adapter touched
 
-**MAY SKIP** only if ALL of the above are false — and the reason must be documented.
+**MAY SKIP** only if all false — document reason.
 
-1. Write integration tests against real infrastructure (Testcontainers if available)
-2. Test adapters against a real database or service
+1. Integration tests against real infra (Testcontainers if available).
+2. Test adapters against real DB/service.
 
-**Gate:** Integration tests must pass.
+**Gate:** Integration tests pass.
 
 ---
 
-### Phase 3.5: E2E Validation (Conditional)
-**Required when:**
-- UI components were added or modified
-- API endpoints were added / modified that interact with the frontend
-- Critical user-facing flows were changed
+### Phase 3.5: E2E (Conditional)
 
-**May skip when:**
-- Pure backend / infrastructure changes
-- Internal library refactoring
-- Test-only changes
+**Required:** UI changes, new/modified user-facing API endpoints, critical flows changed.
+**May skip:** pure backend/infra, internal refactor, test-only changes.
 
-Use Playwright or the available E2E tool. At least one critical user journey must be tested.
+Use Playwright or available E2E tool.
 
-**Gate:** At least one critical user journey passes.
+**Gate:** ≥1 critical user journey passes.
 
 ---
 
 ### Phase 4: Verify
-**Required rules:** `.claude/rules/code-completion-mandate.md` + all applicable mandates
+**Rules:** `code-completion-mandate.md` + applicable mandates
 
-Run the full validation suite:
 ```bash
-# Go
-go vet ./... && golangci-lint run && go test ./... -cover
-
-# TypeScript
-tsc --noEmit && eslint . && vitest run --coverage
-
-# Python
-mypy . && ruff check . && pytest --cov
+# Go:         go vet ./... && golangci-lint run && go test ./... -cover
+# TypeScript: tsc --noEmit && eslint . && vitest run --coverage
+# Python:     mypy . && ruff check . && pytest --cov
 ```
 
-Checklist before proceeding:
-- [ ] Were any storage / database adapter files modified? → Phase 3 REQUIRED
-- [ ] Were any UI changes made? → Phase 3.5 REQUIRED
-- [ ] Lint passes?
-- [ ] All tests pass?
-- [ ] Build succeeds?
-- [ ] Coverage did not drop?
+Checklist:
+- [ ] Storage changes → Phase 3 done?
+- [ ] UI changes → Phase 3.5 done?
+- [ ] Lint/tests/build pass?
+- [ ] Coverage not dropped?
 
-**Gate:** ALL linters, tests, and builds must pass. If anything fails — fix it first, do not proceed.
+**Gate:** All linters/tests/builds pass. Fix failures, do not proceed.
 
 ---
 
 ### Phase 5: Ship
-**Required rules:** `.claude/rules/git-workflow-principles.md`
+**Rules:** `git-workflow-principles.md`
 
 ```bash
 git status
@@ -130,45 +108,27 @@ git add <specific-files>   # never blindly git add .
 git commit -m "feat(<scope>): <description>"
 ```
 
-Conventional commit types:
-- `feat(scope): description` — new feature
-- `fix(scope): description` — bug fix
-- `refactor(scope): description` — refactoring
-- `test(scope): description` — adding tests
-- `docs(scope): description` — documentation
+Commit types: `feat | fix | refactor | test | docs (scope): desc`.
 
-Update `task.md`: mark all items as `[x]`.
+Update `task.md`: mark all `[x]`.
 
 ---
 
-## task.md Status Markers
-
-- `[ ]` = Not started
-- `[/]` = In progress (mark when **starting**)
-- `[x]` = Complete (mark **only after Phase 4 passes**)
-
-**Rule:** Never mark `[x]` before Phase 4 (Verify) passes.
-
----
+## task.md Markers
+- `[ ]` not started
+- `[/]` in progress (set when **starting**)
+- `[x]` complete (**only after Phase 4 passes**)
 
 ## Error Handling
-
-If a phase fails:
-1. **Document the failure** in the task summary
-2. **Do not proceed** to the next phase
-3. **Fix the issue** within the current phase
-4. **Re-run** the phase completion criteria
-5. Then proceed
-
----
+Phase fails → document failure, do not proceed, fix in current phase, re-run criteria, then proceed.
 
 ## Quick Reference
 
 | Phase | Output | Blocking |
 |-------|--------|----------|
-| Research | `task.md` + `docs/research_logs/*.md` | Yes |
+| Research | `task.md` + research log | Yes |
 | Implement | Unit tests + code | Yes |
-| Integrate | Integration tests | Yes (for adapters) |
-| E2E (conditional) | E2E tests | Yes (when required) |
+| Integrate | Integration tests | Yes (adapters) |
+| E2E | E2E tests | When required |
 | Verify | All checks pass | Yes |
 | Ship | Git commit | Yes |

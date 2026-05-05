@@ -1,62 +1,50 @@
 # Sequential Thinking
 
-A structured approach to complex problem-solving that breaks down challenges into iterative thought steps with built-in flexibility for revision and course correction.
+Structured approach to complex problem-solving — iterative thought steps with built-in flexibility for revision and course correction.
 
 ## When to Use This Skill
 
 - Breaking down complex problems into manageable steps
-- Planning and design requiring iterative refinement
+- Planning/design requiring iterative refinement
 - Analysis that might need course correction mid-stream
-- Problems where the full scope emerges during analysis
+- Problems where full scope emerges during analysis
 - Multi-step solutions requiring context across steps
 - Filtering out irrelevant information
 - Hypothesis generation and verification workflows
 
 ## Core Methodology
 
-Sequential thinking follows a dynamic process:
-
-1. **Initial estimation**: Start with an estimate of thoughts needed, but remain flexible
-2. **Iterative analysis**: Work through thoughts sequentially while building context
-3. **Revision capability**: Question or revise previous thoughts as understanding deepens
-4. **Branch exploration**: Explore alternative approaches when needed
-5. **Hypothesis cycle**: Generate hypotheses, verify against thought chain, repeat
-6. **Convergence**: Continue until reaching a satisfactory solution
+1. **Initial estimation:** Estimate thoughts needed, but stay flexible
+2. **Iterative analysis:** Work through thoughts sequentially, building context
+3. **Revision capability:** Question/revise previous thoughts as understanding deepens
+4. **Branch exploration:** Explore alternatives when needed
+5. **Hypothesis cycle:** Generate, verify against thought chain, repeat
+6. **Convergence:** Continue until satisfactory solution
 
 ## Instructions
 
 ### Thought Structure
 
-Each thought in the sequence should include:
-
+Each thought includes:
 - **thought**: Current thinking step content
 - **thoughtNumber**: Position in sequence (1, 2, 3, ...)
-- **totalThoughts**: Current estimate of total thoughts needed (adjustable)
-- **nextThoughtNeeded**: Whether another thought step is required
+- **totalThoughts**: Current estimate (adjustable)
+- **nextThoughtNeeded**: Whether another step is required
 
 Optional revision/branching metadata:
-- **isRevision**: Boolean indicating if reconsidering previous thinking
+- **isRevision**: Boolean — reconsidering previous thinking
 - **revisesThought**: Which thought number is being revised
 - **branchFromThought**: Branching point thought number
 - **branchId**: Identifier for current branch
-- **needsMoreThoughts**: Flag when reaching end but requiring more analysis
+- **needsMoreThoughts**: Reaching end but requires more analysis
 
 ### Process Guidelines
 
-**Starting out:**
-- Estimate initial thoughts needed based on problem complexity
-- Begin with thought 1, establishing context and approach
-- Set totalThoughts conservatively; you can adjust later
+**Starting out:** Estimate initial thoughts by complexity; begin with thought 1 establishing context/approach; set totalThoughts conservatively (adjustable).
 
-**During analysis:**
-- Build on previous thoughts while maintaining context
-- Filter out irrelevant information at each step
-- Express uncertainty when present
-- Don't hesitate to revise if you spot errors or better approaches
-- Adjust totalThoughts up/down as the problem's scope becomes clearer
+**During analysis:** Build on previous thoughts; filter irrelevant info; express uncertainty; revise on errors/better approaches; adjust totalThoughts as scope clarifies.
 
 **Revision pattern:**
-When reconsidering previous thinking:
 ```json
 {
   "thought": "On reflection, thought 3's assumption about X was incorrect because Y...",
@@ -69,36 +57,21 @@ When reconsidering previous thinking:
 ```
 
 **Hypothesis cycle:**
-1. Generate hypothesis based on current understanding
+1. Generate hypothesis from current understanding
 2. Verify against previous thought chain
 3. If verification fails, revise or branch
-4. Repeat until hypothesis is validated
+4. Repeat until validated
 
-**Completion:**
-- Only set `nextThoughtNeeded: False` when truly satisfied with the solution
-- Provide a single, clear final answer
-- Ensure the answer directly addresses the original problem
+**Completion:** Set `nextThoughtNeeded: False` only when truly satisfied; provide single clear final answer; ensure it directly addresses the original problem.
 
 ### Working with Context
 
-**Maintain continuity:**
-- Reference specific previous thoughts by number
-- Build logical connections between thoughts
-- Track which thoughts are still valid vs. revised
-
-**Filter information:**
-- Ignore details irrelevant to current thought step
-- Focus on information that advances understanding
-- Re-evaluate relevance as context evolves
-
-**Manage complexity:**
-- If a thought becomes too complex, break it into multiple thoughts
-- Increase totalThoughts estimate accordingly
-- Keep each individual thought focused
+- **Maintain continuity:** reference previous thoughts by number; build logical connections; track valid vs revised
+- **Filter information:** ignore irrelevant details; focus on what advances understanding; re-evaluate relevance as context evolves
+- **Manage complexity:** break overly complex thoughts into multiple; increase totalThoughts accordingly; keep each thought focused
 
 ### Output Format
 
-Present your sequential thinking in a structured format:
 ```
 Thought [N/Total]: [Current thought content]
 [If revision: "This revises thought X because..."]
@@ -108,17 +81,16 @@ Thought [N/Total]: [Current thought content]
 
 Final output after all thoughts complete:
 Solution: [Clear, direct answer to the original problem]
-
 ```
 
 ## Examples
 
-For concrete examples of sequential thinking in action, see `resources/examples.md`.
+See `resources/examples.md` for concrete examples.
 
 ## Key Principles
 
-- **Flexibility over rigidity**: Adjust your approach as understanding deepens
-- **Revision is strength**: Correcting course shows good reasoning
-- **Hypothesis-driven**: Generate and test hypotheses iteratively
-- **Context-aware**: Maintain awareness of previous thoughts while progressing
-- **Clarity at completion**: Deliver a single, clear final answer
+- **Flexibility over rigidity:** adjust as understanding deepens
+- **Revision is strength:** correcting course shows good reasoning
+- **Hypothesis-driven:** generate and test iteratively
+- **Context-aware:** maintain awareness of previous thoughts while progressing
+- **Clarity at completion:** deliver a single, clear final answer

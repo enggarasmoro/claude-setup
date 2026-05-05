@@ -83,7 +83,7 @@ slog.Info("user login", "userId", userID, "ip", ip)
 ---
 
 ## References
-- Go Idioms and Patterns @go-idioms-and-patterns.md
-- Logging and Observability Principles @logging-and-observability-principles.md
-- Error Handling Principles @error-handling-principles.md
-- Resources and Memory Management Principles @resources-and-memory-management-principles.md
+- Go Idioms and Patterns go-idioms-and-patterns.md
+- Logging and Observability Principles logging-and-observability-principles.md
+- Error Handling Principles error-handling-principles.md
+- Resources and Memory Management Principles resources-and-memory-management-principles.md

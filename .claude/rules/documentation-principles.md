@@ -23,5 +23,5 @@
 5. **Architecture docs:** System design, component interactions, use valid mermaid diagram
 
 ### Related Principles
-- Core Design Principles @core-design-principles.md
-- Code Organization Principles @code-organization-principles.md
+- Core Design Principles core-design-principles.md
+- Code Organization Principles code-organization-principles.md

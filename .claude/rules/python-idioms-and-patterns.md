@@ -2,9 +2,9 @@
 
 ### Core Philosophy
 
-Python rewards explicitness and readability over cleverness. Follow the **Zen of Python** (`import this`) — beautiful code is not a luxury, it's a professional necessity. If it reads like plain English, it's probably idiomatic Python.
+Python rewards explicitness and readability. Follow the **Zen of Python**. If it reads like plain English, it's probably idiomatic.
 
-> **Scope:** This file covers Python-specific *coding idioms*. For file layout, see `project-structure-python-backend.md`. For test naming conventions, see `testing-strategy.md`. For logging library choice, see `logging-and-observability-principles.md`.
+> **Scope:** Python *coding idioms*. Layout: `project-structure-python-backend.md`. Test naming: `testing-strategy.md`. Logging: `logging-and-observability-principles.md`.
 
 ---
 
@@ -13,236 +13,128 @@ Python rewards explicitness and readability over cleverness. Follow the **Zen of
 **Always annotate function signatures and public APIs.** Use `from __future__ import annotations` for forward references.
 
 ```python
-# ✅ Fully annotated — self-documenting and mypy-verifiable
-from __future__ import annotations
-from collections.abc import Sequence
-
+# ✅ Fully annotated
 def calculate_discount(items: Sequence[Item], coupon: Coupon) -> float: ...
-
-# ❌ Untyped — opaque to both mypy and the next developer
+# ❌ Untyped
 def calculate_discount(items, coupon): ...
 ```
 
-1. **Use `X | None` over `Optional[X]`** (Python 3.10+)
-   ```python
-   # ✅ Modern union syntax
-   def find_user(user_id: str) -> User | None: ...
-
-   # ❌ Verbose legacy form (still valid, but prefer the above)
-   from typing import Optional
-   def find_user(user_id: str) -> Optional[User]: ...
-   ```
-
-2. **Use `TypeAlias` and `TypeVar` for reusable generics**
-   ```python
-   from typing import TypeVar, TypeAlias
-
-   T = TypeVar("T")
-   UserId: TypeAlias = str
-   ```
-
-3. **Use `Protocol` for structural interfaces instead of ABCs when duck-typing is sufficient**
-   ```python
-   from typing import Protocol
-
-   class TaskStorage(Protocol):
-       def get_by_id(self, task_id: str) -> Task: ...
-       def save(self, task: Task) -> None: ...
-   ```
-
-4. **`TypedDict` for structured dicts crossing system boundaries (JSON, configs)**
-   ```python
-   from typing import TypedDict
-
-   class CreateTaskRequest(TypedDict):
-       title: str
-       priority: Literal["low", "medium", "high"]
-   ```
+1. **Use `X | None` over `Optional[X]`** (Python 3.10+) — `def find_user(user_id: str) -> User | None`
+2. **Use `TypeAlias` and `TypeVar` for reusable generics** — `T = TypeVar("T")`, `UserId: TypeAlias = str`
+3. **Use `Protocol` for structural interfaces** instead of ABCs when duck-typing is sufficient
+4. **`TypedDict` for structured dicts crossing system boundaries** (JSON, configs)
 
 ---
 
 ### Error Handling
 
-> For general error handling principles, see `error-handling-principles.md`. This section covers Python-specific idioms.
+> See `error-handling-principles.md` for general principles.
 
 1. **Prefer specific exception types over broad `except Exception`**
    ```python
-   # ✅ Precise — catches exactly what you expect
-   try:
-       task = storage.get_by_id(task_id)
-   except TaskNotFoundError:
-       raise HTTPException(status_code=404, detail="Task not found")
-
+   # ✅
+   try: task = storage.get_by_id(task_id)
+   except TaskNotFoundError: raise HTTPException(status_code=404, detail="Task not found")
    # ❌ Broad — may swallow programming errors
-   try:
-       task = storage.get_by_id(task_id)
-   except Exception:
-       raise HTTPException(status_code=500, detail="Error")
+   except Exception: ...
    ```
 
 2. **Define domain-specific exception hierarchies**
    ```python
-   class FathError(Exception):
-       """Base exception for all domain errors."""
-
+   class FathError(Exception): """Base for all domain errors."""
    class NotFoundError(FathError):
        def __init__(self, resource: str, resource_id: str) -> None:
-           self.resource = resource
-           self.resource_id = resource_id
            super().__init__(f"{resource} '{resource_id}' not found")
-
-   class ValidationError(FathError):
-       def __init__(self, field: str, message: str) -> None:
-           self.field = field
-           self.message = message
-           super().__init__(f"Validation failed on '{field}': {message}")
    ```
 
-3. **Never silence exceptions** — if an exception is caught and not re-raised, log it explicitly
+3. **Never silence exceptions** — caught-and-not-reraised must be logged
    ```python
-   # ❌ Silent swallow
-   try:
-       notify_user(user_id)
-   except Exception:
-       pass
-
-   # ✅ Explicit intent + observability
-   try:
-       notify_user(user_id)
+   # ❌ Silent swallow: except Exception: pass
+   # ✅ Explicit
    except NotificationError:
        logger.warning("notification_failed", user_id=user_id, exc_info=True)
    ```
 
 4. **Use `contextlib.suppress` only for truly expected, inconsequential exceptions**
    ```python
-   from contextlib import suppress
-
    with suppress(FileNotFoundError):
-       cache_path.unlink()  # OK — cleanup, not business logic
+       cache_path.unlink()
    ```
 
 ---
 
 ### Dataclasses and Pydantic
 
-1. **Use `dataclasses` for internal domain models** (no I/O, no validation)
+1. **Use `dataclasses` for internal domain models** (no I/O, no validation) — prefer `@dataclass(frozen=True)`
    ```python
-   from dataclasses import dataclass, field
-
-   @dataclass(frozen=True)   # frozen = immutable value object
+   @dataclass(frozen=True)
    class Task:
        id: str
        title: str
-       priority: str
        tags: tuple[str, ...] = field(default_factory=tuple)
    ```
 
 2. **Use Pydantic `BaseModel` for data crossing system boundaries** (API requests/responses, config)
    ```python
-   from pydantic import BaseModel, Field
-
    class CreateTaskRequest(BaseModel):
        title: str = Field(min_length=1, max_length=200)
        priority: Literal["low", "medium", "high"] = "medium"
-       due_date: datetime | None = None
-
        model_config = ConfigDict(frozen=True)  # Pydantic v2
    ```
 
-3. **Keep domain models separate from API schemas** — never use a Pydantic model as a domain entity
-   ```
-   models.py   → dataclasses (pure domain)
-   schemas.py  → Pydantic models (API boundary)
-   ```
+3. **Keep domain models separate from API schemas** — never use a Pydantic model as a domain entity. `models.py` → dataclasses; `schemas.py` → Pydantic.
 
 ---
 
 ### Interfaces and Dependency Injection
 
-Python uses Protocols and constructor injection to achieve the same testability goal as Go interfaces.
+Python uses Protocols + constructor injection for testability.
 
-1. **Define the Protocol where it is *used*, not where it is *implemented***
+1. **Define the Protocol where it is *used*, not where it is *implemented*** — `task/storage.py` defines `TaskStorage` Protocol; `storage_pg.py` implements it.
+
+2. **Inject dependencies through `__init__`** — never instantiate concretes inside a class
    ```python
-   # task/storage.py  ← defined in the consumer feature
-   from typing import Protocol
-
-   class TaskStorage(Protocol):
-       def get_by_id(self, task_id: str) -> Task: ...
-       def save(self, task: Task) -> None: ...
-       def delete(self, task_id: str) -> None: ...
+   # ✅
+   class TaskService:
+       def __init__(self, storage: TaskStorage) -> None: self._storage = storage
+   # ❌ Hardwired: self._storage = PostgresTaskStorage()
    ```
 
-2. **Inject dependencies through `__init__`** — never instantiate concrete dependencies inside a class
+3. **Wire dependencies in the entry point** (`main.py`/`app.py`)
    ```python
-   # ✅ Testable — storage is injected
-   class TaskService:
-       def __init__(self, storage: TaskStorage) -> None:
-           self._storage = storage
-
-   # ❌ Not testable — concrete dependency hardwired
-   class TaskService:
-       def __init__(self) -> None:
-           self._storage = PostgresTaskStorage()
-   ```
-
-3. **Wire dependencies in the entry point** (e.g., `main.py`, `app.py`, or DI container)
-   ```python
-   # app/main.py
    storage = PostgresTaskStorage(db=database)
    service = TaskService(storage=storage)
-   router.include_router(build_task_router(service))
    ```
 
 ---
 
 ### Async / Await
 
-> For general async principles (when to add concurrency), see `concurrency-and-threading-mandate.md`. This section covers Python-specific async idioms.
+> See `concurrency-and-threading-mandate.md` for when to add concurrency.
 
 1. **Choose one async paradigm and stay consistent** — do not mix `asyncio.run` entry points
-   ```python
-   # ✅ Fully async service layer
-   async def get_task(self, task_id: str) -> Task:
-       return await self._storage.get_by_id(task_id)
-   ```
-
 2. **Never call blocking I/O directly in an async function**
    ```python
-   # ❌ Blocks the event loop
-   async def load_file(path: str) -> str:
-       return open(path).read()
-
-   # ✅ Use async I/O or run in executor
-   import asyncio, aiofiles
-
-   async def load_file(path: str) -> str:
-       async with aiofiles.open(path) as f:
-           return await f.read()
+   # ❌ async def load_file(p): return open(p).read()
+   # ✅
+   async with aiofiles.open(path) as f: return await f.read()
    ```
-
 3. **Use `asyncio.gather` for concurrent independent operations**
    ```python
-   # ✅ Concurrent fan-out
-   user, tasks = await asyncio.gather(
-       get_user(user_id),
-       get_tasks(user_id),
-   )
+   user, tasks = await asyncio.gather(get_user(user_id), get_tasks(user_id))
    ```
-
-4. **Use `asyncio.TaskGroup` (Python 3.11+) for structured concurrency with cancellation safety**
+4. **Use `asyncio.TaskGroup` (3.11+) for structured concurrency with cancellation safety**
    ```python
    async with asyncio.TaskGroup() as tg:
-       user_task = tg.create_task(get_user(user_id))
-       tasks_task = tg.create_task(get_tasks(user_id))
-   user = user_task.result()
-   tasks = tasks_task.result()
+       u = tg.create_task(get_user(user_id))
+       t = tg.create_task(get_tasks(user_id))
    ```
 
 ---
 
 ### Naming Conventions
 
-Follow **PEP 8** rigorously. No exceptions.
+Follow **PEP 8** rigorously.
 
 | Construct               | Convention         | Example                      |
 | ----------------------- | ------------------ | ---------------------------- |
@@ -254,18 +146,12 @@ Follow **PEP 8** rigorously. No exceptions.
 | Type alias              | `PascalCase`       | `UserId = str`               |
 | Protocol / Interface    | `PascalCase`       | `TaskStorage`                |
 
-1. **Never use single-letter names outside list comprehensions or math** — names must be descriptive
+1. **Never use single-letter names** outside list comprehensions or math
 2. **Avoid `data`, `info`, `obj`, `result` as standalone names** — describe the *domain concept*
-3. **Boolean variables and functions should read as yes/no questions**
+3. **Boolean variables/functions should read as yes/no questions**
    ```python
-   # ✅
-   is_active: bool
-   has_permission: bool
-   def can_edit(user: User, task: Task) -> bool: ...
-
-   # ❌
-   active: bool
-   permission: bool
+   # ✅ is_active, has_permission, def can_edit(...) -> bool
+   # ❌ active, permission
    ```
 
 ---
@@ -275,177 +161,90 @@ Follow **PEP 8** rigorously. No exceptions.
 1. **Context managers for resource cleanup** — always prefer `with` over manual `close()`
    ```python
    # ✅
-   async with database.transaction() as tx:
-       await tx.execute(query)
-
-   # ❌
-   tx = database.begin()
-   tx.execute(query)
-   tx.commit()  # easily forgotten on exception
+   async with database.transaction() as tx: await tx.execute(query)
+   # ❌ Manual tx.commit() — easily forgotten on exception
    ```
 
 2. **Generator expressions over list comprehensions for lazy evaluation**
    ```python
-   # ✅ Lazy — does not materialise the entire list
-   active_ids = (task.id for task in tasks if task.is_active)
-
-   # Use list comprehension only when you need the full list
-   active_tasks = [task for task in tasks if task.is_active]
+   active_ids = (task.id for task in tasks if task.is_active)  # lazy
+   active_tasks = [task for task in tasks if task.is_active]   # only when full list needed
    ```
 
-3. **`dataclasses.replace()` for immutable updates** (preferred over mutating frozen dataclasses)
-   ```python
-   from dataclasses import replace
-
-   updated_task = replace(task, title="New Title")
-   ```
-
-4. **`functools.cache` / `functools.lru_cache` for pure function memoization**
-   ```python
-   from functools import cache
-
-   @cache
-   def get_config() -> AppConfig:  # called once; result reused
-       return _load_config_from_env()
-   ```
-
+3. **`dataclasses.replace()` for immutable updates** — `updated = replace(task, title="New")`
+4. **`functools.cache` / `lru_cache` for pure function memoization**
 5. **`__slots__` on hot-path, frequently instantiated classes**
+6. **`enum.StrEnum` (3.11+) for domain-level constants** — never raw strings
    ```python
-   @dataclass
-   class Vector:
-       __slots__ = ("x", "y")
-       x: float
-       y: float
-   ```
-
-6. **`enum.Enum` (not raw strings) for domain-level constants**
-   ```python
-   from enum import StrEnum   # Python 3.11+
-
    class Priority(StrEnum):
-       LOW    = "low"
-       MEDIUM = "medium"
-       HIGH   = "high"
+       LOW = "low"; MEDIUM = "medium"; HIGH = "high"
    ```
 
 ---
 
 ### Testing
 
-> Test file naming and pyramid proportions are defined in `testing-strategy.md`. This section covers Python-specific tooling only.
+> See `testing-strategy.md` for naming/proportions.
 
-1. **Use `pytest` as the sole test runner** — never mix with `unittest.TestCase` classes
+1. **Use `pytest` as the sole test runner** — never mix `unittest.TestCase`
+2. **Parametrize with `@pytest.mark.parametrize`**
    ```python
-   # ✅ Idiomatic pytest
-   def test_calculate_discount_returns_zero_for_no_items() -> None:
-       result = calculate_discount(items=[], coupon=Coupon(code="SAVE10"))
-       assert result == 0.0
+   @pytest.mark.parametrize("priority,score", [("low",1),("medium",5),("high",10)])
+   def test_priority_score(priority, score): assert priority_score(priority) == score
    ```
-
-2. **Parametrize test cases with `@pytest.mark.parametrize`**
+3. **Use `pytest-mock` (`mocker` fixture)** — not `unittest.mock` directly
    ```python
-   @pytest.mark.parametrize("priority,expected_score", [
-       ("low",    1),
-       ("medium", 5),
-       ("high",  10),
-   ])
-   def test_priority_score(priority: str, expected_score: int) -> None:
-       assert priority_score(priority) == expected_score
+   mock_storage = mocker.create_autospec(TaskStorage, instance=True)
    ```
-
-3. **Use `pytest-mock` (`mocker` fixture) for mocking — not `unittest.mock` directly**
+4. **Typed mock factory for Protocol interfaces** — co-locate `storage_mock.py` with `storage.py`
    ```python
-   def test_task_service_creates_task(mocker: MockerFixture) -> None:
-       mock_storage = mocker.create_autospec(TaskStorage, instance=True)
-       service = TaskService(storage=mock_storage)
-
-       service.create(title="Test", priority="high")
-
-       mock_storage.save.assert_called_once()
-   ```
-
-4. **Use a typed mock factory for Protocol-based interfaces**
-   ```python
-   # storage_mock.py  ← co-locate with storage.py
    class InMemoryTaskStorage:
-       """In-memory TaskStorage implementation for unit tests."""
-
-       def __init__(self) -> None:
-           self._store: dict[str, Task] = {}
-
-       def get_by_id(self, task_id: str) -> Task:
-           if task_id not in self._store:
-               raise NotFoundError("Task", task_id)
-           return self._store[task_id]
-
-       def save(self, task: Task) -> None:
-           self._store[task.id] = task
-
-       def delete(self, task_id: str) -> None:
-           self._store.pop(task_id, None)
+       def __init__(self) -> None: self._store: dict[str, Task] = {}
+       def get_by_id(self, task_id): ...  # raises NotFoundError if missing
+       def save(self, task): self._store[task.id] = task
    ```
-
-5. **Use `pytest-asyncio` for async tests** — mark the whole module or use `asyncio_mode = "auto"` in `pyproject.toml`
-   ```python
-   import pytest
-
-   @pytest.mark.asyncio
-   async def test_async_create_task() -> None:
-       service = TaskService(storage=InMemoryTaskStorage())
-       task = await service.create(title="Async Task", priority="low")
-       assert task.title == "Async Task"
-   ```
-
-6. **Fixtures for reusable setup** — never repeat identical `Arrange` blocks across tests
-   ```python
-   @pytest.fixture
-   def task_service() -> TaskService:
-       return TaskService(storage=InMemoryTaskStorage())
-   ```
+5. **Use `pytest-asyncio` for async tests** — set `asyncio_mode = "auto"` in `pyproject.toml`
+6. **Fixtures for reusable setup** — never repeat identical Arrange blocks
 
 ---
 
 ### Formatting and Static Analysis
 
-All of the following **must pass with zero warnings/errors** before any commit. See `code-completion-mandate.md` for the full checklist.
+All **must pass with zero warnings/errors** before any commit. See `code-completion-mandate.md`.
 
-| Tool         | Purpose                           | Command                            |
-| ------------ | --------------------------------- | ---------------------------------- |
-| `ruff format`| Canonical formatting (fast)       | `ruff format .`                    |
-| `ruff check` | Lint (replaces flake8, isort, ...) | `ruff check . --fix`              |
-| `mypy`       | Static type checking              | `mypy src/ --strict`               |
-| `bandit`     | Security scanning                 | `bandit -r src/ -c pyproject.toml` |
-| `pip-audit`  | Dependency CVE scanning           | `pip-audit`                        |
+| Tool         | Purpose                            | Command                            |
+| ------------ | ---------------------------------- | ---------------------------------- |
+| `ruff format`| Canonical formatting (fast)        | `ruff format .`                    |
+| `ruff check` | Lint (replaces flake8, isort, ...) | `ruff check . --fix`               |
+| `mypy`       | Static type checking               | `mypy src/ --strict`               |
+| `bandit`     | Security scanning                  | `bandit -r src/ -c pyproject.toml` |
+| `pip-audit`  | Dependency CVE scanning            | `pip-audit`                        |
 
-Configure all tools in `pyproject.toml` — never use per-file pragma comments to disable checks without a `# NOQA:` reason comment.
+Configure all tools in `pyproject.toml`. Never use per-file pragma comments without a `# NOQA:` reason comment.
 
 ```toml
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "S", "B", "ANN"]
-ignore = []
-
 [tool.mypy]
 strict = true
 python_version = "3.11"
-
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 ```
 
-> **Logging:** Never use `print()` in production code — it produces unstructured output. Use the standard `logging` module or `structlog` for structured JSON logs. See `logging-and-observability-principles.md` for the required patterns.
+> **Logging:** Never use `print()` in production code. Use `logging` or `structlog`. See `logging-and-observability-principles.md`.
 
 ---
 
 ### Related Principles
-- Code Idioms and Conventions @code-idioms-and-conventions.md
-- Project Structure — Python Backend @project-structure-python-backend.md
-- Testing Strategy @testing-strategy.md
-- Error Handling Principles @error-handling-principles.md
-- Concurrency and Threading Mandate @concurrency-and-threading-mandate.md
-- Logging and Observability Principles @logging-and-observability-principles.md
-- Security Principles @security-principles.md
-- Dependency Management Principles @dependency-management-principles.md
+- Code Idioms and Conventions code-idioms-and-conventions.md
+- Project Structure — Python Backend project-structure-python-backend.md
+- Testing Strategy testing-strategy.md
+- Error Handling Principles error-handling-principles.md
+- Concurrency and Threading Mandate concurrency-and-threading-mandate.md
+- Logging and Observability Principles logging-and-observability-principles.md
+- Security Principles security-principles.md
+- Dependency Management Principles dependency-management-principles.md

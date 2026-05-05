@@ -38,9 +38,9 @@
 * **Storage:** Never commit secrets to git. Use `.env` (local) or Secret Managers (Prod - e.g., Vault/GSM).
 
 ### Related Principles
-- Error Handling Principles @error-handling-principles.md
-- API Design Principles @api-design-principles.md
-- Logging and Observability Mandate @logging-and-observability-mandate.md
-- Logging and Observability Principles @logging-and-observability-principles.md
-- Configuration Management Principles @configuration-management-principles.md
-- Command Execution Principles @command-execution-principles.md
+- Error Handling Principles error-handling-principles.md
+- API Design Principles api-design-principles.md
+- Logging and Observability Mandate logging-and-observability-mandate.md
+- Logging and Observability Principles logging-and-observability-principles.md
+- Configuration Management Principles configuration-management-principles.md
+- Command Execution Principles command-execution-principles.md

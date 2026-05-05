@@ -2,84 +2,53 @@
 
 ### Separation of Configuration and Code
 
-**Configuration:**
+**Configuration:** environment-specific values (URLs, credentials, timeouts); changes between dev/staging/prod; can change without code deployment.
 
-- Environment-specific values (URLs, credentials, timeouts)  
-- Changes between dev/staging/prod  
-- Can change without code deployment
-
-**Code:**
-
-- Business logic and application behavior  
-- Same across all environments  
-- Requires deployment to change
+**Code:** business logic and application behavior; same across environments; requires deployment to change.
 
 **Never hardcode configuration in code:**
-
-- ❌ `const DB_URL = "postgresql://prod-db:5432/myapp"`  
+- ❌ `const DB_URL = "postgresql://prod-db:5432/myapp"`
 - ✅ `const DB_URL = process.env.DATABASE_URL`
 
 ### Configuration Validation
 
 **Validate at startup:**
+- Check all required configuration is present
+- Fail fast if required config is missing or invalid
+- Provide clear error messages (e.g., "DATABASE_URL environment variable is required")
 
-- Check all required configuration is present  
-- Fail fast if required config is missing or invalid  
-- Provide clear error messages for misconfiguration  
-- Example: "DATABASE_URL environment variable is required"
-
-**Validation checks:**
-
-- Type (string, number, boolean, enum)  
-- Format (URL, email, file path)  
-- Range (port numbers 1-65535)  
-- Dependencies (if feature X enabled, config Y required)
+**Validation checks:** type (string/number/boolean/enum), format (URL, email, file path), range (port 1–65535), dependencies (if feature X enabled, config Y required).
 
 ### Configuration Hierarchy
 
 **Precedence (highest to lowest):**
+1. **Command-line arguments** — override everything (testing, debugging)
+2. **Environment variables** — override config files
+3. **Config files** — environment-specific (config.prod.yaml, config.dev.yaml)
+4. **Defaults** — reasonable defaults in code (fallback)
 
-1. **Command-line arguments:** Override everything (for testing, debugging)  
-2. **Environment variables:** Override config files  
-3. **Config files:** Environment-specific (config.prod.yaml, config.dev.yaml)  
-4. **Defaults:** Reasonable defaults in code (fallback)
-
-**Example:**
-
-Database port resolution:
-
-1. Check CLI arg: --db-port=5433
-
-2. Check env var: DB_PORT=5432
-
-3. Check config file: database.port=5432
-
-4. Use default: 5432
+Example DB port: CLI `--db-port=5433` → env `DB_PORT=5432` → config `database.port=5432` → default `5432`.
 
 ### Configuration Organization
 
-Hybrid Approach (config files + .env files): define the structure of configuration in config files (e.g. config/database.yaml) and use .env files to inject the secret values.
+**Hybrid approach (config files + .env files):** define structure in config files (e.g. `config/database.yaml`), inject secret values via .env files.
 
-**.env files:** Description: A file dedicated to a specific environment (development) for production these values comes from secrets/environment platfrom or manager not a physical `.env` file on disk. When to Use: Use this only for secrets (API keys, passwords) and a few environment-specific values (like a server IP). These files except `.env.template` should never be committed to version control (git).
+**.env files:** for secrets (API keys, passwords) and environment-specific values (server IP). In production, secrets come from a secret manager — not a physical `.env` file. Never commit except `.env.template`.
+- `.env.template` — credentials/secrets with blank values (commit to git)
+- `.env.development` — local dev credentials/secrets (do NOT commit)
 
-- `.env.template` - Consist of credentials and secrets with blank value (SHOULD commit to git)  
-- `.env.development` - Local development credentials and secrets (SHOULD NOT commit to git)  
-
-**Example `.env.development`:**
 ```
+# .env.development
 DEV_DB_HOST=123.45.67.89
 DEV_DB_USERNAME=prod_user
 DEV_DB_PASSWORD=a_very_secure_production_password
 ```
 
-**Feature files:** Description: Settings are grouped into files based on what they do (database, auth, etc.). This keeps your configuration organized. When to Use: Use this as your primary method for organizing non-secret settings. It’s the best way to keep your configuration clean and scalable as your application grows.
+**Feature files:** group non-secret settings by purpose (database, auth, etc.). Primary method for organizing configuration.
+- `config/database.yaml`, `config/redis.yaml`, `config/auth.yaml`
 
-- `config/database.yaml` - Database settings  
-- `config/redis.yaml` - Cache settings  
-- `config/auth.yaml` - Authentication settings
-
-**Example `config/database.yaml`:**
-```
+```yaml
+# config/database.yaml
 default: &default
   adapter: postgresql
   pool: 5
@@ -87,7 +56,7 @@ development:
   <<: *default
   host: localhost
   database: myapp_dev
-  username: <%= ENV['DEV_DB_USERNAME'] %> # Placeholder for a secret
+  username: <%= ENV['DEV_DB_USERNAME'] %>
   password: <%= ENV['DEV_DB_PASSWORD'] %>
 production:
   <<: *default
@@ -97,9 +66,9 @@ production:
   password: <%= ENV['PROD_DB_PASSWORD'] %>
 ```
 
-> **Note:** Feature flag configuration is a distinct, PRD-gated concern — not routine application configuration. See Feature Flags Principles @feature-flags-principles.md for when and how feature flags are used.
+> **Note:** Feature flag configuration is a distinct, PRD-gated concern — see Feature Flags Principles feature-flags-principles.md.
 
 ### Related Principles
-- Security Mandate @security-mandate.md
-- Security Principles @security-principles.md
-- Feature Flags Principles @feature-flags-principles.md
+- Security Mandate security-mandate.md
+- Security Principles security-principles.md
+- Feature Flags Principles feature-flags-principles.md
