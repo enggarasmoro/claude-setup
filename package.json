@@ -1,6 +1,6 @@
 {
   "name": "@enggar_asmoro/claude-setup",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Claude Code configuration installer — engineering standards for AI-assisted development",
   "keywords": [
     "claude",
