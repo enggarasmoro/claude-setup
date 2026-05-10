@@ -57,6 +57,10 @@ Read the file at the path when the topic is relevant to the current task. Do NOT
 - Python: `.claude/rules/python-idioms-and-patterns.md`
 - Rust: `.claude/rules/rust-idioms-and-patterns.md`
 - Flutter/Dart: `.claude/rules/flutter-idioms-and-patterns.md`
+- PHP (native — backend): `.claude/rules/php-idioms-and-patterns.md`
+- PHP (native — frontend: Twig/HTMX/Alpine/Vite): `.claude/rules/php-frontend-idioms-and-patterns.md`
+- Laravel (backend): `.claude/rules/laravel-idioms-and-patterns.md` (load alongside PHP)
+- Laravel (frontend — Blade/Livewire/Inertia/Filament): `.claude/rules/laravel-frontend-idioms-and-patterns.md`
 
 ### Project structure per stack (load only the stack in use)
 - Universal: `.claude/rules/project-structure.md`
@@ -65,6 +69,8 @@ Read the file at the path when the topic is relevant to the current task. Do NOT
 - Python backend: `.claude/rules/project-structure-python-backend.md`
 - Flutter mobile: `.claude/rules/project-structure-flutter-mobile.md`
 - Rust/Cargo: `.claude/rules/project-structure-rust-cargo.md`
+- PHP backend (native/micro-framework): `.claude/rules/project-structure-php-backend.md`
+- Laravel backend: `.claude/rules/project-structure-laravel-backend.md`
 
 ---
 
